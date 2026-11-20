@@ -9,6 +9,7 @@ import Landing from './pages/Landing'
 import Login from './pages/Login'
 import Features from './pages/Features'
 import About from './pages/About'
+import VikePamana from './pages/VikePamana'
 
 // If a lazy JS chunk fails to load after a new Vercel deploy, auto-reload once cleanly.
 function lazyWithRetry(importer) {
@@ -49,6 +50,7 @@ export default function App() {
               <Route path="/" element={<Landing />} />
               <Route path="/features" element={<Features />} />
               <Route path="/about" element={<About />} />
+              <Route path="/vike-pamana" element={<VikePamana />} />
               <Route path="/login" element={<Login />} />
 
               {/* Private pages (login needed, noindex) */}

@@ -19,6 +19,12 @@ const STATIC_ROUTES = [
       'About Vimana (Vike Pamana), the boarding house expense sharing and cleaning rotation web app for residents near the University of Moratuwa.',
   },
   {
+    route: 'vike-pamana',
+    title: 'Vike Pamana — Vimana Boarding House',
+    description:
+      'Vike Pamana boarding house portal on Vimana (vimana.site) for fair expense splitting, payment confirmation, and weekly cleaning rotation.',
+  },
+  {
     route: 'login',
     title: 'Log in | Vimana',
     description: 'Log in to your Vimana (Vike Pamana) boarding house account.',
