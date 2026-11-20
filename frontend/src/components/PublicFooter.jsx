@@ -11,7 +11,7 @@ export default function PublicFooter() {
         <Link to="/about">About</Link>
         <Link to="/login">Log in</Link>
       </nav>
-      <p className="mt-3 text-slate-400">© {CURRENT_YEAR} Vike Pamana • Vimana • vimana.site</p>
+      <p className="mt-3 text-slate-400">© {CURRENT_YEAR} Vimana • vimana.site</p>
     </footer>
   )
 }

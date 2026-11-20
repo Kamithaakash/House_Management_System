@@ -6,8 +6,8 @@ import usePageMeta from '../hooks/usePageMeta'
 
 export default function Landing() {
   usePageMeta(
-    'Vike Pamana — Vimana Boarding House Manager',
-    'Vike Pamana (Vimana) is a boarding house web app to split food, electricity, water, and monthly bills fairly, confirm payments, and manage cleaning turns.',
+    'Vimana — Boarding House Expense & Cleaning Manager',
+    'Vimana (Vike Pamana) is a boarding house web app to split food, electricity, water, and monthly bills fairly, confirm payments, and manage cleaning turns.',
   )
 
   const { user } = useAuth()
@@ -16,16 +16,16 @@ export default function Landing() {
 
   return (
     <main className="mx-auto max-w-md px-4 py-10 text-center">
-      <h1 className="text-3xl font-bold text-indigo-700">Vike Pamana</h1>
+      <h1 className="text-3xl font-bold text-indigo-700">Vimana</h1>
       <p className="mt-1 text-sm font-medium text-slate-500">
-        Vimana Boarding House Expense &amp; Cleaning Manager
+        Boarding House Expense &amp; Cleaning Manager
       </p>
       <p className="mt-3 text-slate-600">
-        Vike Pamana (Vimana) helps our boarding house split food and utility bills fairly, confirm
-        cash payments, and keep the house clean with a fair cleaning rotation.
+        Vimana helps our boarding house split food and utility bills fairly, confirm cash payments,
+        and keep the house clean with a fair cleaning rotation.
       </p>
 
-      <section className="mt-8 space-y-3 text-left" aria-label="Vike Pamana Vimana features">
+      <section className="mt-8 space-y-3 text-left" aria-label="Vimana features">
         <div className="rounded-xl bg-white p-4 shadow-sm">
           <h2 className="font-semibold">Fair expense splits</h2>
           <p className="mt-1 text-sm text-slate-600">
@@ -51,7 +51,7 @@ export default function Landing() {
           to="/login"
           className="flex min-h-12 items-center justify-center rounded-lg bg-indigo-600 font-medium text-white"
         >
-          Log in to Vike Pamana
+          Log in to Vimana
         </Link>
         <InstallPrompt />
       </div>

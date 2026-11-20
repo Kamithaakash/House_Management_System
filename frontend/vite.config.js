@@ -8,20 +8,20 @@ import { defineConfig } from 'vite'
 const STATIC_ROUTES = [
   {
     route: 'features',
-    title: 'Features | Vike Pamana — Vimana Boarding House',
+    title: 'Features | Vimana Boarding House',
     description:
-      'Explore Vike Pamana (Vimana) features: fair food & utility bill splitting, two-step payment confirmation, manual debt redirects, weekly cleaning rotation, and mobile PWA install.',
+      'Explore Vimana (Vike Pamana) features: fair food & utility bill splitting, two-step payment confirmation, manual debt redirects, weekly cleaning rotation, and mobile PWA install.',
   },
   {
     route: 'about',
-    title: 'About | Vike Pamana — Vimana Boarding House',
+    title: 'About | Vimana Boarding House',
     description:
-      'About Vike Pamana (Vimana), the boarding house expense sharing and cleaning rotation web app for residents near the University of Moratuwa.',
+      'About Vimana (Vike Pamana), the boarding house expense sharing and cleaning rotation web app for residents near the University of Moratuwa.',
   },
   {
     route: 'login',
-    title: 'Log in | Vike Pamana — Vimana',
-    description: 'Log in to your Vike Pamana (Vimana) boarding house account.',
+    title: 'Log in | Vimana',
+    description: 'Log in to your Vimana (Vike Pamana) boarding house account.',
   },
   { route: 'dashboard', title: 'Home | Vimana', noindex: true },
   { route: 'add-expense', title: 'Add Expense | Vimana', noindex: true },

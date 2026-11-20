@@ -4,13 +4,13 @@ import usePageMeta from '../hooks/usePageMeta'
 
 export default function Features() {
   usePageMeta(
-    'Features | Vike Pamana — Vimana Boarding House',
-    'Explore Vike Pamana (Vimana) features: fair food & utility bill splitting, two-step payment confirmation, manual debt redirects, weekly cleaning rotation, and mobile PWA install.',
+    'Features | Vimana Boarding House',
+    'Explore Vimana (Vike Pamana) features: fair food & utility bill splitting, two-step payment confirmation, manual debt redirects, weekly cleaning rotation, and mobile PWA install.',
   )
 
   return (
     <main className="mx-auto max-w-md px-4 py-10">
-      <h1 className="text-2xl font-bold text-indigo-700">Features of Vike Pamana (Vimana)</h1>
+      <h1 className="text-2xl font-bold text-indigo-700">Features of Vimana</h1>
       <p className="mt-2 text-sm text-slate-600">
         Built to remove calculation errors, missing members, and disputes over shared expenses and
         cleaning duties.
@@ -41,8 +41,8 @@ export default function Features() {
         <article className="rounded-xl bg-white p-4 shadow-sm">
           <h2 className="font-semibold">Installable Mobile Web App (PWA)</h2>
           <p className="mt-1 text-sm text-slate-600">
-            Install Vike Pamana directly to your Android or iPhone home screen with persistent login
-            and offline write protection.
+            Install Vimana directly to your Android or iPhone home screen with persistent login and
+            offline write protection.
           </p>
         </article>
       </section>
@@ -51,7 +51,7 @@ export default function Features() {
         to="/login"
         className="mt-6 flex min-h-12 items-center justify-center rounded-lg bg-indigo-600 font-medium text-white"
       >
-        Log in to Vike Pamana
+        Log in to Vimana
       </Link>
 
       <PublicFooter />
