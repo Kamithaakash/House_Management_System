@@ -53,7 +53,7 @@ export default function Landing() {
         <div className="mt-8 space-y-3">
           <Link
             to="/login"
-            className="flex min-h-12 items-center justify-center rounded-xl bg-rose-800 font-semibold text-white shadow-lg transition hover:bg-rose-900 active:scale-[0.99]"
+            className="flex min-h-12 items-center justify-center rounded-xl bg-indigo-700 font-semibold text-white shadow-lg transition hover:bg-indigo-800 active:scale-[0.99]"
           >
             Log in
           </Link>

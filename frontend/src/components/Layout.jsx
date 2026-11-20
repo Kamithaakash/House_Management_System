@@ -41,7 +41,7 @@ export default function Layout() {
             to={path}
             className={({ isActive }) =>
               `flex min-h-13 flex-col items-center justify-center rounded-xl text-xs transition ${
-                isActive ? 'bg-rose-50 font-bold text-rose-800' : 'text-slate-500 hover:text-slate-800'
+                isActive ? 'bg-indigo-50 font-bold text-indigo-700' : 'text-slate-500 hover:text-slate-800'
               }`
             }
           >

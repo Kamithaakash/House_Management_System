@@ -174,7 +174,7 @@ export default function AddExpense() {
           {members.map((m) => (
             <div key={m.id} className="flex min-h-12 items-center gap-3 border-b border-slate-100">
               <input
-                id={`m${m.id}`} type="checkbox" className="h-6 w-6"
+                id={`m${m.id}`} type="checkbox" className="h-6 w-6 accent-indigo-700"
                 checked={!excluded.has(m.id)} onChange={() => toggleMember(m.id)}
               />
               <label htmlFor={`m${m.id}`} className="flex-1">{m.name}</label>

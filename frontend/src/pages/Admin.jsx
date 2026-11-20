@@ -94,7 +94,7 @@ function CleaningSetup({ members }) {
         <legend className={labelClass}>Members</legend>
         {members.map((m) => (
           <div key={m.id} className="flex min-h-12 items-center gap-3">
-            <input id={`g${m.id}`} type="checkbox" className="h-6 w-6" checked={picked.has(m.id)} onChange={() => toggle(m.id)} />
+            <input id={`g${m.id}`} type="checkbox" className="h-6 w-6 accent-indigo-700" checked={picked.has(m.id)} onChange={() => toggle(m.id)} />
             <label htmlFor={`g${m.id}`}>{m.name}</label>
           </div>
         ))}

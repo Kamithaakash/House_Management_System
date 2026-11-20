@@ -1,14 +1,15 @@
 import useOnlineStatus from '../hooks/useOnlineStatus'
 
 // Shared style strings (Flyweight): defined once, reused on every screen.
+// Semantic FinTech palette: Indigo = app actions, Red = you owe/danger, Green = owed to you/settled.
 // text-base (16px) on inputs stops phones from zooming in when you tap a field.
 export const inputClass =
-  'mt-1 w-full rounded-xl border border-slate-300 bg-white p-3 text-base transition focus:border-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-100'
+  'mt-1 w-full rounded-xl border border-slate-300 bg-white p-3 text-base transition focus:border-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-100'
 export const labelClass = 'block text-sm font-medium text-slate-700'
 export const cardClass = 'rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm'
 
 const COLORS = {
-  primary: 'bg-rose-800 text-white shadow-sm hover:bg-rose-900',
+  primary: 'bg-indigo-700 text-white shadow-sm hover:bg-indigo-800',
   danger: 'bg-red-600 text-white shadow-sm hover:bg-red-700',
   light: 'border border-slate-300 bg-white text-slate-800 hover:bg-slate-50',
 }

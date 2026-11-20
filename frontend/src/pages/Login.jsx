@@ -70,7 +70,7 @@ export default function Login() {
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 w-full rounded-xl bg-white/65 p-3 text-base text-slate-900 placeholder:text-slate-600 backdrop-blur-sm transition focus:bg-white/90 focus:outline-none focus:ring-2 focus:ring-rose-500"
+                className="mt-1 w-full rounded-xl bg-white/65 p-3 text-base text-slate-900 placeholder:text-slate-600 backdrop-blur-sm transition focus:bg-white/90 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
 
@@ -87,7 +87,7 @@ export default function Login() {
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-xl bg-white/65 p-3 pr-16 text-base text-slate-900 placeholder:text-slate-600 backdrop-blur-sm transition focus:bg-white/90 focus:outline-none focus:ring-2 focus:ring-rose-500"
+                  className="w-full rounded-xl bg-white/65 p-3 pr-16 text-base text-slate-900 placeholder:text-slate-600 backdrop-blur-sm transition focus:bg-white/90 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
                 <button
                   type="button"
