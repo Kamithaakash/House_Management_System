@@ -22,9 +22,9 @@ export default function Landing() {
         <img
           src="/login-bg.webp"
           alt=""
-          className="h-full w-full scale-105 object-cover object-center blur-[3px]"
+          className="h-full w-full scale-105 object-cover object-center blur-[2px]"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/30 via-slate-900/25 to-slate-950/65" />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/10 via-transparent to-slate-950/35" />
       </div>
 
       <div aria-hidden="true" />

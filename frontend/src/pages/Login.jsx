@@ -30,14 +30,14 @@ export default function Login() {
         <img
           src="/login-bg.webp"
           alt=""
-          className="h-full w-full scale-105 object-cover object-center blur-[3px]"
+          className="h-full w-full scale-105 object-cover object-center blur-[2px]"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/25 via-slate-900/20 to-slate-950/45" />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/10 via-transparent to-slate-950/30" />
       </div>
 
       <main className="w-full max-w-sm">
-        {/* Transparent frosted-glass login panel (no outline, background photo shines through) */}
-        <div className="rounded-3xl bg-slate-950/20 p-6 shadow-2xl backdrop-blur-md">
+        {/* Balanced frosted-glass login panel */}
+        <div className="rounded-3xl bg-white/15 p-6 shadow-xl backdrop-blur-sm">
           <div className="text-center">
             <div className="mx-auto flex h-18 w-18 items-center justify-center rounded-2xl bg-white/85 p-2 shadow-md">
               <img
@@ -58,7 +58,7 @@ export default function Login() {
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-white/90">
+              <label htmlFor="email" className="block text-sm font-medium text-white drop-shadow-sm">
                 Email address
               </label>
               <input
@@ -70,12 +70,12 @@ export default function Login() {
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 w-full rounded-xl bg-white/85 p-3 text-base text-slate-900 placeholder:text-slate-400 shadow-inner transition focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-500"
+                className="mt-1 w-full rounded-xl bg-white/65 p-3 text-base text-slate-900 placeholder:text-slate-600 backdrop-blur-sm transition focus:bg-white/90 focus:outline-none focus:ring-2 focus:ring-rose-500"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-white/90">
+              <label htmlFor="password" className="block text-sm font-medium text-white drop-shadow-sm">
                 Password
               </label>
               <div className="relative mt-1">
@@ -87,7 +87,7 @@ export default function Login() {
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-xl bg-white/85 p-3 pr-16 text-base text-slate-900 placeholder:text-slate-400 shadow-inner transition focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-500"
+                  className="w-full rounded-xl bg-white/65 p-3 pr-16 text-base text-slate-900 placeholder:text-slate-600 backdrop-blur-sm transition focus:bg-white/90 focus:outline-none focus:ring-2 focus:ring-rose-500"
                 />
                 <button
                   type="button"
