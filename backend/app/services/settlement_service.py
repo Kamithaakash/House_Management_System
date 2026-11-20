@@ -91,12 +91,8 @@ def get_balances_overview(db: Session, current_user: User) -> BalancesOverviewRe
 
     transfers = (
         db.query(DebtTransfer)
-        .filter(
-            (DebtTransfer.from_debtor == current_user.id)
-            | (DebtTransfer.via_middleman == current_user.id)
-            | (DebtTransfer.to_creditor == current_user.id)
-        )
         .order_by(DebtTransfer.created_at.desc())
+        .limit(20)
         .all()
     )
 

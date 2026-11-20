@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import RedirectNoticeCard from '../components/RedirectNoticeCard'
 import { Button, ErrorText, Page, cardClass, inputClass, labelClass } from '../components/ui'
 import { useAuth } from '../context/AuthContext'
 import useAction from '../hooks/useAction'
@@ -50,6 +51,13 @@ export default function Balances() {
   const waiting = data.pending_settlements.filter((s) => s.to_user === user.id)
   const sent = data.pending_settlements.filter((s) => s.from_user === user.id)
 
+  const myRedirects = data.redirect_notices.filter(
+    (n) => n.from_debtor === user.id || n.via_middleman === user.id || n.to_creditor === user.id,
+  )
+  const otherRedirects = data.redirect_notices.filter(
+    (n) => n.from_debtor !== user.id && n.via_middleman !== user.id && n.to_creditor !== user.id,
+  )
+
   const post = (path, body) => api(path, { method: 'POST', body }).then(reload)
 
   return (
@@ -77,6 +85,31 @@ export default function Balances() {
         </p>
       ))}
 
+      {/* Manual redirect: someone owes me, and I owe a third person */}
+      {owedToMe.flatMap((a) =>
+        iOwe
+          .filter((c) => c.to_user !== a.from_user)
+          .map((c) => (
+            <AmountAction
+              key={`${a.from_user}-${c.to_user}`}
+              title={`Let ${a.from_name} pay ${c.to_name}`}
+              subtitle={`${a.from_name} owes you ${formatCents(a.amount_cents)} and you owe ${c.to_name} ${formatCents(c.amount_cents)}. Redirect it so ${a.from_name} pays ${c.to_name} directly.`}
+              maxCents={Math.min(a.amount_cents, c.amount_cents)}
+              buttonText="Redirect payment"
+              onSubmit={(cents) => post('/settlements/redirect', { from_debtor: a.from_user, to_creditor: c.to_user, amount_cents: cents })}
+            />
+          )),
+      )}
+
+      {myRedirects.length > 0 && (
+        <section className="space-y-2">
+          <h2 className="font-semibold">Your payment redirects</h2>
+          {myRedirects.map((n) => (
+            <RedirectNoticeCard key={n.id} notice={n} currentUserId={user.id} />
+          ))}
+        </section>
+      )}
+
       <section className="space-y-3">
         <h2 className="font-semibold">You owe</h2>
         {iOwe.length === 0 && <p className="text-sm text-slate-500">You owe nobody.</p>}
@@ -97,31 +130,6 @@ export default function Balances() {
         ))}
       </section>
 
-      {/* Manual redirect: someone owes me, and I owe a third person */}
-      {owedToMe.flatMap((a) =>
-        iOwe
-          .filter((c) => c.to_user !== a.from_user)
-          .map((c) => (
-            <AmountAction
-              key={`${a.from_user}-${c.to_user}`}
-              title={`Let ${a.from_name} pay ${c.to_name}`}
-              subtitle={`${a.from_name} owes you and you owe ${c.to_name}. Send their payment straight to ${c.to_name}.`}
-              maxCents={Math.min(a.amount_cents, c.amount_cents)}
-              buttonText="Redirect payment"
-              onSubmit={(cents) => post('/settlements/redirect', { from_debtor: a.from_user, to_creditor: c.to_user, amount_cents: cents })}
-            />
-          )),
-      )}
-
-      {data.redirect_notices.length > 0 && (
-        <section className="space-y-2">
-          <h2 className="font-semibold">Redirect notices</h2>
-          {data.redirect_notices.map((n) => (
-            <p key={n.id} className="rounded-xl bg-indigo-50 p-3 text-sm">{n.message}</p>
-          ))}
-        </section>
-      )}
-
       {others.length > 0 && (
         <section className="space-y-2">
           <h2 className="font-semibold">Other house balances</h2>
@@ -129,6 +137,15 @@ export default function Balances() {
             <p key={`${d.from_user}-${d.to_user}`} className="text-sm text-slate-600">
               {d.from_name} owes {d.to_name} {formatCents(d.amount_cents)}
             </p>
+          ))}
+        </section>
+      )}
+
+      {otherRedirects.length > 0 && (
+        <section className="space-y-2">
+          <h2 className="font-semibold">Other house redirects</h2>
+          {otherRedirects.map((n) => (
+            <RedirectNoticeCard key={n.id} notice={n} currentUserId={user.id} />
           ))}
         </section>
       )}
