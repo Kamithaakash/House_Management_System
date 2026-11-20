@@ -83,6 +83,7 @@ def test_equal_split_and_my_bill_privacy():
     alice_bill = client.get("/api/expenses/my-bill").json()
     assert len(alice_bill["rows"]) == 1
     assert alice_bill["total_you_owe_cents"] == 5000
+    assert alice_bill["rows"][0]["can_delete"] is True  # Alice is admin
 
 
 def test_per_person_food_validation():

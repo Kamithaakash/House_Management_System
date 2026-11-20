@@ -153,6 +153,18 @@ def fulfill_obligation(
     return _to_obligation_response(ob, user.name if user else "Unknown")
 
 
+def list_pending_obligations(db: Session) -> list[ObligationResponse]:
+    """Admin view: all penalty obligations that still need to be fulfilled."""
+    user_map = {u.id: u.name for u in db.query(User.id, User.name).all()}
+    rows = (
+        db.query(PenaltyObligation)
+        .filter(PenaltyObligation.status == "pending")
+        .order_by(PenaltyObligation.created_at.asc())
+        .all()
+    )
+    return [_to_obligation_response(ob, user_map.get(ob.user_id, "Unknown")) for ob in rows]
+
+
 def get_my_penalties(db: Session, user: User) -> MyPenaltiesResponse:
     settings = _get_or_create_settings(db)
     active_points = _get_active_points(db, user.id)

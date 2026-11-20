@@ -78,6 +78,10 @@ def test_penalty_trigger_fulfill_and_reminders():
     ob_id = kasun_penalties["obligations"][0]["id"]
     assert kasun_penalties["obligations"][0]["status"] == "pending"
 
+    # Admin can list all pending obligations; a member cannot
+    pending = client.get("/api/admin/penalties/obligations").json()
+    assert len(pending) == 1 and pending[0]["user_name"] == "Kasun"
+
     # Admin adds an expense where Admin (1) paid Rs. 100 for Kasun (2)
     client.post("/api/expenses", json={
         "paid_by": 1,

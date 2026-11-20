@@ -4,4 +4,12 @@ body {
   margin: 0;
   background: #f8fafc;
   color: #0f172a;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Keep phones from zooming when a field is tapped */
+input,
+select,
+textarea {
+  font-size: 16px;
 }

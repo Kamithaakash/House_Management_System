@@ -213,6 +213,7 @@ def get_my_bill(db: Session, current_user: User) -> MyBillResponse:
                 total_cents=exp.total_cents,
                 your_share_cents=your_share,
                 you_paid=you_paid,
+                can_delete=(exp.created_by == current_user.id or current_user.role == "admin"),
             )
         )
 

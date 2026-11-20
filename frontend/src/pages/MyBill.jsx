@@ -1,63 +1,60 @@
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Button, ErrorText, Page, cardClass } from '../components/ui'
+import useAction from '../hooks/useAction'
+import useLoad from '../hooks/useLoad'
+import usePageMeta from '../hooks/usePageMeta'
 import { api } from '../services/api'
 import { formatCents } from '../utils/money'
-import usePageMeta from '../hooks/usePageMeta'
 
 export default function MyBill() {
   usePageMeta('My Bill | Boarding Management System', '', true) // private: noindex
 
-  const [bill, setBill] = useState(null)
-  const [error, setError] = useState('')
+  const { data: bill, error: loadError, reload } = useLoad('/expenses/my-bill')
+  const { busy, error, run } = useAction()
 
-  useEffect(() => {
-    api('/expenses/my-bill').then(setBill).catch((err) => setError(err.message))
-  }, [])
+  async function remove(id) {
+    if (!window.confirm('Delete this expense?')) return
+    await run(async () => {
+      await api(`/expenses/${id}`, { method: 'DELETE' })
+      reload()
+    })
+  }
 
-  if (error) return <p role="alert" className="p-6 text-red-600">{error}</p>
-  if (!bill) return <p className="p-6">Loading...</p>
+  if (loadError) return <ErrorText text={loadError} />
+  if (!bill) return <p>Loading...</p>
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-8">
-      <Link to="/dashboard" className="text-sm text-indigo-700">&larr; Back</Link>
-      <h1 className="mt-2 text-2xl font-bold">My Bill</h1>
+    <Page title="My Bill">
+      <ErrorText text={error} />
 
-      <div className="mt-4 overflow-x-auto rounded-lg bg-white shadow">
-        <table className="w-full text-left text-sm">
-          <thead className="bg-slate-100">
-            <tr>
-              <th className="p-3">Date</th>
-              <th className="p-3">Item</th>
-              <th className="p-3">Paid by</th>
-              <th className="p-3 text-right">Total</th>
-              <th className="p-3 text-right">Your share</th>
-            </tr>
-          </thead>
-          <tbody>
-            {bill.rows.map((row) => (
-              <tr key={row.expense_id} className="border-t">
-                <td className="p-3">{row.expense_date}</td>
-                <td className="p-3">{row.item_name}</td>
-                <td className="p-3">{row.paid_by_name}</td>
-                <td className="p-3 text-right">{formatCents(row.total_cents)}</td>
-                <td className="p-3 text-right">{formatCents(row.your_share_cents)}</td>
-              </tr>
-            ))}
-            {bill.rows.length === 0 && (
-              <tr><td colSpan="5" className="p-3 text-slate-500">No transactions yet.</td></tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+      {bill.rows.length === 0 && <p className="text-slate-500">No transactions yet.</p>}
 
-      <section className="mt-4 rounded-lg bg-white p-4 shadow">
-        <p>Total you owe: <strong>{formatCents(bill.total_you_owe_cents)}</strong></p>
-        <p>Total owed to you: <strong>{formatCents(bill.total_owed_to_you_cents)}</strong></p>
-        <p className="mt-2 text-lg">
+      {bill.rows.map((row) => (
+        <article key={row.expense_id} className={cardClass}>
+          <div className="flex justify-between gap-2">
+            <h2 className="font-semibold">{row.item_name}</h2>
+            <span className="text-sm text-slate-500">{row.expense_date}</span>
+          </div>
+          <p className="text-sm text-slate-600">Paid by {row.paid_by_name}</p>
+          <div className="mt-2 flex justify-between text-sm">
+            <span>Total {formatCents(row.total_cents)}</span>
+            <strong>Your share {formatCents(row.your_share_cents)}</strong>
+          </div>
+          {row.can_delete && (
+            <Button variant="light" busy={busy} onClick={() => remove(row.expense_id)} className="mt-3">
+              Delete
+            </Button>
+          )}
+        </article>
+      ))}
+
+      <section className={`${cardClass} space-y-1`}>
+        <p>You owe: <strong>{formatCents(bill.total_you_owe_cents)}</strong></p>
+        <p>Owed to you: <strong>{formatCents(bill.total_owed_to_you_cents)}</strong></p>
+        <p className="pt-2 text-lg">
           Net: <strong>{formatCents(Math.abs(bill.net_cents))}</strong>{' '}
           {bill.net_cents >= 0 ? 'to receive' : 'to pay'}
         </p>
       </section>
-    </main>
+    </Page>
   )
 }

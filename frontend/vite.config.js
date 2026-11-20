@@ -14,6 +14,8 @@ export default defineConfig({
         short_name: 'Boarding',
         description: 'Share house expenses, settle payments and manage cleaning turns.',
         display: 'standalone',
+        orientation: 'portrait',
+        scope: '/',
         start_url: '/',
         theme_color: '#4f46e5',
         background_color: '#ffffff',

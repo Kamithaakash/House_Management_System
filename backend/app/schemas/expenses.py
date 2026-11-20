@@ -57,6 +57,7 @@ class MyBillRow(BaseModel):
     total_cents: int
     your_share_cents: int
     you_paid: bool
+    can_delete: bool
 
 
 class MyBillResponse(BaseModel):

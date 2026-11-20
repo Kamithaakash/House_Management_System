@@ -43,6 +43,14 @@ def add_penalty(
     return penalty_service.add_penalty_points(db, data, admin)
 
 
+@router.get("/admin/penalties/obligations", response_model=list[ObligationResponse])
+def pending_obligations(
+    admin: User = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    return penalty_service.list_pending_obligations(db)
+
+
 @router.post("/admin/penalties/obligations/{obligation_id}/fulfill", response_model=ObligationResponse)
 def fulfill_penalty(
     obligation_id: int,
