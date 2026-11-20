@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /my-bill
+Disallow: /balances
+Disallow: /chores
+Disallow: /admin
+Disallow: /api/
+
+Sitemap: https://YOUR-DOMAIN.vercel.app/sitemap.xml
