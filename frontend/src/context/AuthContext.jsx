@@ -13,6 +13,10 @@ export function AuthProvider({ children }) {
       .then(setUser)
       .catch(() => setUser(null))
       .finally(() => setLoading(false))
+
+    const onExpired = () => setUser(null)
+    window.addEventListener('auth:expired', onExpired)
+    return () => window.removeEventListener('auth:expired', onExpired)
   }, [])
 
   async function login(email, password) {

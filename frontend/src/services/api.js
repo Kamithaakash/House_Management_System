@@ -14,6 +14,10 @@ export async function api(path, { method = 'GET', body } = {}) {
   const data = await response.json().catch(() => ({}))
 
   if (!response.ok) {
+    // If session cookie expired while browsing, tell AuthContext to redirect cleanly to /login
+    if (response.status === 401 && path !== '/auth/login' && path !== '/auth/me') {
+      window.dispatchEvent(new Event('auth:expired'))
+    }
     const detail = Array.isArray(data.detail)
       ? data.detail.map((d) => d.msg).join(', ')
       : data.detail

@@ -25,7 +25,10 @@ export default defineConfig({
         ],
       },
       workbox: {
-        // Cache only the static app shell. Never cache private API data.
+        // Cache only the static app shell. Clean up old chunks immediately on new deploys.
+        cleanupOutdatedCaches: true,
+        skipWaiting: true,
+        clientsClaim: true,
         globPatterns: ['**/*.{js,css,html,svg,png,ico}'],
         navigateFallbackDenylist: [/^\/api/],
       },

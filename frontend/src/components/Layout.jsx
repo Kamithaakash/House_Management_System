@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 
 const TABS = [
@@ -9,11 +10,14 @@ const TABS = [
 ]
 
 // Mobile layout: content on top, thumb-friendly tab bar at the bottom.
+// Suspense lives INSIDE Layout so the bottom tab bar never vanishes while switching tabs.
 export default function Layout() {
   return (
     <div className="mx-auto min-h-screen max-w-md">
       <main className="p-4 pb-28">
-        <Outlet />
+        <Suspense fallback={<p className="py-8 text-center text-sm text-slate-500">Loading...</p>}>
+          <Outlet />
+        </Suspense>
       </main>
 
       <nav
