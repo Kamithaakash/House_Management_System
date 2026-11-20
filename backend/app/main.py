@@ -4,7 +4,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
 from sqlalchemy.orm import Session
-from app.routers import auth, expenses
 from app.config import get_settings
 from app.database import Base, engine, get_db
 from app.routers import auth, chores, expenses, penalties, settlements
@@ -58,8 +57,6 @@ async def safe_exception_handler(request: Request, exc: Exception):
     raise exc
 
 
-app.include_router(auth.router)
-app.include_router(expenses.router)
 app.include_router(auth.router)
 app.include_router(expenses.router)
 app.include_router(settlements.router)

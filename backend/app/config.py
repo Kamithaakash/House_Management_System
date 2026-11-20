@@ -1,9 +1,10 @@
 import os
 from functools import lru_cache
+from pathlib import Path
 from dotenv import load_dotenv
 
-# Load variables from backend/.env into the environment
-load_dotenv()
+# Load backend/.env when running locally (Vercel uses its own Environment Variables)
+load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
 
 class Settings:
