@@ -12,7 +12,7 @@ const STATUS = {
 }
 
 export default function Chores() {
-  usePageMeta('Cleaning Turns | Boarding Management System', '', true) // private: noindex
+  usePageMeta('Cleaning Turns | Vimana', '', true) // private: noindex
 
   const chores = useLoad('/chores')
   const penalties = useLoad('/penalties/me')
@@ -35,8 +35,8 @@ export default function Chores() {
       {turn ? (
         <section className={cardClass}>
           <h2 className="text-lg font-semibold">{turn.group_name}</h2>
-          <span className={`mt-1 inline-block rounded-full px-3 py-1 text-xs ${STATUS[turn.status][1]}`}>
-            {STATUS[turn.status][0]}
+          <span className={`mt-1 inline-block rounded-full px-3 py-1 text-xs ${(STATUS[turn.status] || ['', 'bg-slate-100 text-slate-800'])[1]}`}>
+            {(STATUS[turn.status] || [turn.status])[0]}
           </span>
           <p className="mt-2 text-sm text-slate-600">Due: {turn.due_date}</p>
 
@@ -73,7 +73,7 @@ export default function Chores() {
             .filter((o) => o.status === 'pending')
             .map((o) => (
               <p key={o.id} className="mt-2 rounded-lg bg-red-50 p-3 text-sm text-red-800">
-                Pay a fine of {formatCents(o.amount_cents)} or bring cleaning materials (Harpic, brush, broom, soap).
+                Pay a fine of {o.amount_cents != null ? formatCents(o.amount_cents) : 'configured fine'} or bring cleaning materials (Harpic, brush, broom, soap).
               </p>
             ))}
         </section>

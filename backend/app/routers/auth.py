@@ -29,11 +29,13 @@ settings = get_settings()
 
 @router.post("/auth/login", response_model=UserResponse)
 def login(data: LoginRequest, request: Request, response: Response, db: Session = Depends(get_db)):
-    client_ip = request.client.host if request.client else "unknown"
-    rate_key = f"{client_ip}:{data.email.lower()}"
+    forwarded = request.headers.get("x-forwarded-for", "").split(",")[0].strip()
+    client_ip = forwarded or (request.client.host if request.client else "unknown")
+    clean_email = data.email.strip().lower()
+    rate_key = f"{client_ip}:{clean_email}"
     check_rate_limit(rate_key)
 
-    user = db.query(User).filter(User.email == data.email.lower()).first()
+    user = db.query(User).filter(User.email == clean_email).first()
 
     # Generic error message prevents attackers from guessing which emails exist
     if not user or not verify_password(data.password, user.password_hash) or not user.is_active:
@@ -59,7 +61,12 @@ def login(data: LoginRequest, request: Request, response: Response, db: Session 
 
 @router.post("/auth/logout")
 def logout(response: Response):
-    response.delete_cookie(key=COOKIE_NAME)
+    response.delete_cookie(
+        key=COOKIE_NAME,
+        httponly=True,
+        secure=settings.environment == "production",
+        samesite="lax",
+    )
     return {"detail": "Logged out"}
 
 
@@ -82,13 +89,14 @@ def create_member(
     admin: User = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
-    existing = db.query(User).filter(User.email == data.email.lower()).first()
+    clean_email = data.email.strip().lower()
+    existing = db.query(User).filter(User.email == clean_email).first()
     if existing:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already exists")
 
     new_user = User(
         name=data.name.strip(),
-        email=data.email.lower().strip(),
+        email=clean_email,
         phone=data.phone,
         password_hash=hash_password(data.password),
         role=data.role,

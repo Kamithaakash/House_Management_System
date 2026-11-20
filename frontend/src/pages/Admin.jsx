@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button, ErrorText, Page, cardClass, inputClass, labelClass } from '../components/ui'
 import useAction from '../hooks/useAction'
 import useLoad from '../hooks/useLoad'
 import usePageMeta from '../hooks/usePageMeta'
 import { api } from '../services/api'
-import { formatCents, rupeesToCents } from '../utils/money'
+import { centsToText, formatCents, rupeesToCents } from '../utils/money'
 
 function Field({ id, label, ...props }) {
   return (
@@ -15,7 +15,7 @@ function Field({ id, label, ...props }) {
   )
 }
 
-function AddMember() {
+function AddMember({ onAdded }) {
   const empty = { name: '', email: '', phone: '', password: '' }
   const [form, setForm] = useState(empty)
   const [done, setDone] = useState('')
@@ -24,11 +24,18 @@ function AddMember() {
 
   async function save() {
     setDone('')
-    const body = { ...form, phone: form.phone || null, role: 'member' }
+    const body = {
+      name: form.name.trim(),
+      email: form.email.trim(),
+      phone: form.phone.trim() || null,
+      password: form.password,
+      role: 'member',
+    }
     const ok = await run(() => api('/admin/members', { method: 'POST', body }))
     if (ok) {
-      setDone(`${form.name} added`)
+      setDone(`${body.name} added`)
       setForm(empty)
+      onAdded()
     }
   }
 
@@ -94,7 +101,7 @@ function CleaningSetup({ members }) {
       </fieldset>
       <ErrorText text={error} />
       {done && <p className="text-sm text-emerald-700">{done}</p>}
-      <Button busy={busy} onClick={createGroup}>Create group</Button>
+      <Button busy={busy} disabled={!name.trim() || Number(order) < 1 || picked.size === 0} onClick={createGroup}>Create group</Button>
       <Button variant="light" busy={busy} onClick={start}>Start cleaning queue</Button>
     </section>
   )
@@ -166,10 +173,18 @@ function Penalties({ members }) {
 }
 
 function Settings() {
+  const loaded = useLoad('/admin/settings')
   const [threshold, setThreshold] = useState('3')
   const [fine, setFine] = useState('500.00')
   const [done, setDone] = useState('')
   const { busy, error, run } = useAction()
+
+  useEffect(() => {
+    if (loaded.data) {
+      setThreshold(String(loaded.data.penalty_threshold))
+      setFine(centsToText(loaded.data.default_fine_cents))
+    }
+  }, [loaded.data])
 
   async function save() {
     setDone('')
@@ -231,9 +246,10 @@ function Reminders() {
 }
 
 export default function Admin() {
-  usePageMeta('Admin | Boarding Management System', '', true) // private: noindex
+  usePageMeta('Admin | Vimana', '', true) // private: noindex
 
-  const members = useLoad('/members').data || []
+  const membersState = useLoad('/members')
+  const members = membersState.data || []
 
   return (
     <Page title="Admin panel">
@@ -241,7 +257,7 @@ export default function Admin() {
       <Penalties members={members} />
       <CleaningSetup members={members} />
       <Settings />
-      <AddMember />
+      <AddMember onAdded={membersState.reload} />
     </Page>
   )
 }

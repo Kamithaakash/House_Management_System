@@ -15,6 +15,11 @@ from app.schemas.settlements import (
 )
 
 
+def _format_rs(cents: int) -> str:
+    """Format integer cents to Rs. without float division."""
+    return f"Rs. {cents // 100}.{cents % 100:02d}"
+
+
 def _get_user_map(db: Session) -> dict[int, str]:
     """Flyweight: load user id -> name once per request."""
     return {uid: name for uid, name in db.query(User.id, User.name).all()}
@@ -100,7 +105,7 @@ def get_balances_overview(db: Session, current_user: User) -> BalancesOverviewRe
         a_name = user_map.get(t.from_debtor, "Unknown")
         b_name = user_map.get(t.via_middleman, "Unknown")
         c_name = user_map.get(t.to_creditor, "Unknown")
-        rs = f"Rs. {t.amount_cents / 100:.2f}"
+        rs = _format_rs(t.amount_cents)
         notices.append(
             RedirectNoticeResponse(
                 id=t.id,
@@ -150,7 +155,7 @@ def create_settlement(db: Session, data: SettlementCreate, current_user: User) -
     if data.amount_cents > remaining_cents:
         raise HTTPException(
             status_code=422,
-            detail=f"Amount exceeds remaining unpaid balance (Rs. {remaining_cents / 100:.2f})",
+            detail=f"Amount exceeds remaining unpaid balance ({_format_rs(remaining_cents)})",
         )
 
     settlement = Settlement(
@@ -269,7 +274,7 @@ def redirect_debt(db: Session, data: DebtRedirectCreate, current_user: User) -> 
     a_name = user_map[transfer.from_debtor]
     b_name = user_map[transfer.via_middleman]
     c_name = user_map[transfer.to_creditor]
-    rs = f"Rs. {transfer.amount_cents / 100:.2f}"
+    rs = _format_rs(transfer.amount_cents)
     return RedirectNoticeResponse(
         id=transfer.id,
         from_debtor=transfer.from_debtor,

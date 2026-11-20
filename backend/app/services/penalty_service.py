@@ -46,6 +46,20 @@ def _to_obligation_response(ob: PenaltyObligation, user_name: str) -> Obligation
     )
 
 
+def _format_rs(cents: int) -> str:
+    """Format integer cents to Rs. without float division."""
+    return f"Rs. {cents // 100}.{cents % 100:02d}"
+
+
+def get_house_settings(db: Session) -> dict:
+    settings = _get_or_create_settings(db)
+    db.commit()
+    return {
+        "penalty_threshold": settings.penalty_threshold,
+        "default_fine_cents": settings.default_fine_cents,
+    }
+
+
 def update_house_settings(db: Session, data: HouseSettingsUpdate, admin: User) -> dict:
     settings = _get_or_create_settings(db)
     settings.penalty_threshold = data.penalty_threshold
@@ -183,13 +197,14 @@ def get_my_penalties(db: Session, user: User) -> MyPenaltiesResponse:
 
 def generate_whatsapp_reminders(db: Session) -> list[ReminderItemResponse]:
     """Builder pattern: combines all debts + pending penalties into 1 message per debtor."""
-    users = db.query(User).filter(User.is_active.is_(True)).all()
-    user_by_id = {u.id: u for u in users}
+    all_users = db.query(User).all()
+    name_by_id = {u.id: u.name for u in all_users}
+    active_by_id = {u.id: u for u in all_users if u.is_active}
 
     live_debts = _compute_live_debts(db)
     debts_by_user: dict[int, list[tuple[str, int]]] = {}
     for from_u, to_u, amount in live_debts:
-        creditor_name = user_by_id[to_u].name if to_u in user_by_id else "Unknown"
+        creditor_name = name_by_id.get(to_u, "Unknown")
         debts_by_user.setdefault(from_u, []).append((creditor_name, amount))
 
     pending_obs = db.query(PenaltyObligation).filter(PenaltyObligation.status == "pending").all()
@@ -201,17 +216,17 @@ def generate_whatsapp_reminders(db: Session) -> list[ReminderItemResponse]:
     reminders = []
 
     for uid in affected_user_ids:
-        user = user_by_id.get(uid)
+        user = active_by_id.get(uid)
         if not user:
             continue
 
         lines = [f"Hi {user.name}, Boarding House Reminder:"]
 
         for creditor_name, amount in debts_by_user.get(uid, []):
-            lines.append(f"- You owe {creditor_name}: Rs. {amount / 100:.2f}")
+            lines.append(f"- You owe {creditor_name}: {_format_rs(amount)}")
 
         for ob in obs_by_user.get(uid, []):
-            fine = f"Rs. {ob.amount_cents / 100:.2f}" if ob.amount_cents else "fine"
+            fine = _format_rs(ob.amount_cents) if ob.amount_cents else "fine"
             lines.append(f"- Pending Cleaning Penalty: pay {fine} or bring cleaning materials.")
 
         message = "\n".join(lines)

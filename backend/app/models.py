@@ -113,9 +113,10 @@ class CleaningTurn(Base):
     __table_args__ = (
         Index(
             "ix_one_open_cleaning_turn",
-            "status",
+            text("(1)"),
             unique=True,
             postgresql_where=text("status IN ('active', 'overdue', 'pending_approval')"),
+            sqlite_where=text("status IN ('active', 'overdue', 'pending_approval')"),
         ),
     )
 

@@ -6,7 +6,7 @@ import { api } from '../services/api'
 import { formatCents } from '../utils/money'
 
 export default function MyBill() {
-  usePageMeta('My Bill | Boarding Management System', '', true) // private: noindex
+  usePageMeta('My Bill | Vimana', '', true) // private: noindex
 
   const { data: bill, error: loadError, reload } = useLoad('/expenses/my-bill')
   const { busy, error, run } = useAction()
@@ -52,7 +52,7 @@ export default function MyBill() {
         <p>Owed to you: <strong>{formatCents(bill.total_owed_to_you_cents)}</strong></p>
         <p className="pt-2 text-lg">
           Net: <strong>{formatCents(Math.abs(bill.net_cents))}</strong>{' '}
-          {bill.net_cents >= 0 ? 'to receive' : 'to pay'}
+          {bill.net_cents === 0 ? 'all settled' : bill.net_cents > 0 ? 'to receive' : 'to pay'}
         </p>
       </section>
     </Page>

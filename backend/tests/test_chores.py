@@ -84,3 +84,10 @@ def test_blocking_cleaning_and_next_group_approval():
     next_turn = client.post(f"/api/chores/{turn1['id']}/approve").json()
     assert next_turn["group_name"] == "Group 2"
     assert next_turn["status"] == "active"
+
+    # Second cycle also completes cleanly (multiple completed turns allowed by DB index)
+    assert client.post(f"/api/chores/{next_turn['id']}/mark-done").status_code == 200
+    login("m1@test.com")
+    turn3 = client.post(f"/api/chores/{next_turn['id']}/approve").json()
+    assert turn3["group_name"] == "Group 1"
+    assert turn3["status"] == "active"

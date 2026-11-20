@@ -7,7 +7,7 @@ import usePageMeta from '../hooks/usePageMeta'
 import { formatCents } from '../utils/money'
 
 export default function Dashboard() {
-  usePageMeta('Home | Boarding Management System', '', true) // private: noindex
+  usePageMeta('Home | Vimana', '', true) // private: noindex
 
   const { user, logout } = useAuth()
   const bill = useLoad('/expenses/my-bill')

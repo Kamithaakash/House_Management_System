@@ -197,7 +197,8 @@ def approve_turn(db: Session, turn_id: int, current_user: User) -> CleaningTurnR
 
     next_group = _get_next_group(db, turn.group_id)
     is_next_group_member = (
-        db.query(CleaningGroupMember)
+        next_group.id != turn.group_id
+        and db.query(CleaningGroupMember)
         .filter(
             CleaningGroupMember.group_id == next_group.id,
             CleaningGroupMember.user_id == current_user.id,

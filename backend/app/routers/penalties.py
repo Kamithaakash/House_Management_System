@@ -25,6 +25,14 @@ def my_penalties(
     return penalty_service.get_my_penalties(db, current_user)
 
 
+@router.get("/admin/settings")
+def get_settings_route(
+    admin: User = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    return penalty_service.get_house_settings(db)
+
+
 @router.put("/admin/settings")
 def update_settings(
     data: HouseSettingsUpdate,

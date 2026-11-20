@@ -42,7 +42,7 @@ function Select({ id, label, value, onChange, options }) {
 }
 
 export default function AddExpense() {
-  usePageMeta('Add Expense | Boarding Management System', '', true) // private: noindex
+  usePageMeta('Add Expense | Vimana', '', true) // private: noindex
 
   const { user } = useAuth()
   const navigate = useNavigate()

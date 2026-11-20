@@ -38,9 +38,17 @@ app.add_middleware(
 )
 
 
-# Security headers on every response
+# Security headers + production CSRF header check on state-changing API calls
 @app.middleware("http")
 async def add_security_headers(request: Request, call_next):
+    if (
+        is_prod
+        and request.method in ("POST", "PUT", "PATCH", "DELETE")
+        and request.url.path.startswith("/api/")
+        and request.headers.get("x-requested-with") != "XMLHttpRequest"
+    ):
+        return JSONResponse(status_code=403, content={"detail": "Missing required CSRF header"})
+
     response = await call_next(request)
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"

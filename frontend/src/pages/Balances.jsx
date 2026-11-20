@@ -35,7 +35,7 @@ function AmountAction({ title, subtitle, maxCents, buttonText, onSubmit }) {
 }
 
 export default function Balances() {
-  usePageMeta('Balances & Payments | Boarding Management System', '', true) // private: noindex
+  usePageMeta('Balances & Payments | Vimana', '', true) // private: noindex
 
   const { user } = useAuth()
   const { data, error, reload } = useLoad('/balances')
