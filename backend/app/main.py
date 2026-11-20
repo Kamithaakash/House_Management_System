@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from app.routers import auth, expenses
 from app.config import get_settings
 from app.database import Base, engine, get_db
+from app.routers import auth, expenses, settlements
 import app.models  # noqa: F401 - registers all 12 tables with Base
 
 settings = get_settings()
@@ -59,6 +60,9 @@ async def safe_exception_handler(request: Request, exc: Exception):
 
 app.include_router(auth.router)
 app.include_router(expenses.router)
+app.include_router(auth.router)
+app.include_router(expenses.router)
+app.include_router(settlements.router)
 
 
 @app.get("/api/health")
