@@ -8,7 +8,9 @@ import ProtectedRoute from './components/ProtectedRoute'
 import Landing from './pages/Landing'
 import Login from './pages/Login'
 import Features from './pages/Features'
+import Install from './pages/Install'
 import About from './pages/About'
+import Privacy from './pages/Privacy'
 import VikePamana from './pages/VikePamana'
 
 // If a lazy JS chunk fails to load after a new Vercel deploy, auto-reload once cleanly.
@@ -49,7 +51,9 @@ export default function App() {
               {/* Public pages (indexed by search engines) */}
               <Route path="/" element={<Landing />} />
               <Route path="/features" element={<Features />} />
+              <Route path="/install" element={<Install />} />
               <Route path="/about" element={<About />} />
+              <Route path="/privacy" element={<Privacy />} />
               <Route path="/vike-pamana" element={<VikePamana />} />
               <Route path="/login" element={<Login />} />
 

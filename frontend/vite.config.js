@@ -13,10 +13,22 @@ const STATIC_ROUTES = [
       'Explore Vimana (Vike Pamana) features: fair food & utility bill splitting, two-step payment confirmation, manual debt redirects, weekly cleaning rotation, and mobile PWA install.',
   },
   {
+    route: 'install',
+    title: 'Install App | Vimana Boarding House',
+    description:
+      'How to install the Vimana boarding house web app (PWA) on Android and iPhone home screens for fast access without app stores.',
+  },
+  {
     route: 'about',
     title: 'About | Vimana Boarding House',
     description:
       'About Vimana (Vike Pamana), the boarding house expense sharing and cleaning rotation web app for residents near the University of Moratuwa.',
+  },
+  {
+    route: 'privacy',
+    title: 'Privacy & Security | Vimana Boarding House',
+    description:
+      'How Vimana protects boarding house member privacy, bills, phone numbers, and login sessions using Argon2 encryption and HttpOnly cookies.',
   },
   {
     route: 'vike-pamana',
