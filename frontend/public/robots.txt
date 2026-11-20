@@ -7,4 +7,4 @@ Disallow: /chores
 Disallow: /admin
 Disallow: /api/
 
-Sitemap: https://YOUR-DOMAIN.vercel.app/sitemap.xml
+Sitemap: https://vimana.site/sitemap.xml
