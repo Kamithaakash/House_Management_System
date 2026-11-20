@@ -19,9 +19,9 @@ export default function Landing() {
       <img
         src="/main-logo.png"
         alt="Vimana logo"
-        width="72"
-        height="72"
-        className="mx-auto mb-3 h-18 w-18 rounded-2xl object-cover shadow-sm"
+        width="80"
+        height="80"
+        className="mx-auto mb-2 h-20 w-20 object-contain"
       />
       <h1 className="text-3xl font-bold text-indigo-700">Vimana</h1>
       <p className="mt-1 text-sm font-medium text-slate-500">

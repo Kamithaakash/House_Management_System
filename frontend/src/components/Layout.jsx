@@ -20,7 +20,7 @@ export default function Layout() {
           alt="Vimana logo"
           width="32"
           height="32"
-          className="h-8 w-8 rounded-lg object-cover"
+          className="h-8 w-8 object-contain"
         />
         <span className="text-base font-bold text-indigo-700">Vimana</span>
       </header>

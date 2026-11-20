@@ -30,7 +30,7 @@ export default function Login() {
           alt="Vimana logo"
           width="44"
           height="44"
-          className="h-11 w-11 rounded-xl object-cover shadow-sm"
+          className="h-11 w-11 object-contain"
         />
         <h1 className="text-2xl font-bold">Log in</h1>
       </div>

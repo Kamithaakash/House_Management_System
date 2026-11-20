@@ -17,7 +17,7 @@ export default function About() {
             alt="Vimana logo"
             width="36"
             height="36"
-            className="h-9 w-9 rounded-lg object-cover shadow-sm"
+            className="h-9 w-9 object-contain"
           />
           <span>Vimana</span>
         </Link>
