@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from app.routers import auth, expenses
 from app.config import get_settings
 from app.database import Base, engine, get_db
-from app.routers import auth, expenses, settlements
+from app.routers import auth, chores, expenses, penalties, settlements
 import app.models  # noqa: F401 - registers all 12 tables with Base
 
 settings = get_settings()
@@ -63,6 +63,8 @@ app.include_router(expenses.router)
 app.include_router(auth.router)
 app.include_router(expenses.router)
 app.include_router(settlements.router)
+app.include_router(chores.router)
+app.include_router(penalties.router)
 
 
 @app.get("/api/health")
