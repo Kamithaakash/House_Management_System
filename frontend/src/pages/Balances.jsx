@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button, ErrorText, Page, cardClass, inputClass, labelClass } from '../components/ui'
 import { useAuth } from '../context/AuthContext'
 import useAction from '../hooks/useAction'
@@ -11,6 +11,10 @@ import { centsToText, formatCents, rupeesToCents } from '../utils/money'
 function AmountAction({ title, subtitle, maxCents, buttonText, onSubmit }) {
   const [amount, setAmount] = useState(centsToText(maxCents))
   const { busy, error, run } = useAction()
+
+  useEffect(() => {
+    setAmount(centsToText(maxCents))
+  }, [maxCents])
 
   async function submit() {
     const cents = rupeesToCents(amount)

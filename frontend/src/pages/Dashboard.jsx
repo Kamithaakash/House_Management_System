@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import InstallPrompt from '../components/InstallPrompt'
-import { Page, cardClass } from '../components/ui'
+import { ErrorText, Page, cardClass } from '../components/ui'
 import { useAuth } from '../context/AuthContext'
 import useLoad from '../hooks/useLoad'
 import usePageMeta from '../hooks/usePageMeta'
@@ -21,11 +21,17 @@ export default function Dashboard() {
     <Page title={`Hello, ${user.name}`}>
       <section className={cardClass}>
         <h2 className="text-sm text-slate-500">Your net balance</h2>
-        {bill.data ? (
+        {bill.error ? (
+          <ErrorText text={bill.error} />
+        ) : bill.data ? (
           <p className="mt-1 text-2xl font-bold">
             {formatCents(Math.abs(bill.data.net_cents))}{' '}
             <span className="text-base font-normal text-slate-500">
-              {bill.data.net_cents >= 0 ? 'to receive' : 'to pay'}
+              {bill.data.net_cents === 0
+                ? 'all settled'
+                : bill.data.net_cents > 0
+                  ? 'to receive'
+                  : 'to pay'}
             </span>
           </p>
         ) : (

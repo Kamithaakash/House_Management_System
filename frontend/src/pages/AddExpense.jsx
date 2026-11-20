@@ -53,7 +53,7 @@ export default function AddExpense() {
   const [itemName, setItemName] = useState('')
   const [foodType, setFoodType] = useState('rice_curry')
   const [curryType, setCurryType] = useState('veg')
-  const [date, setDate] = useState(new Date().toISOString().slice(0, 10))
+  const [date, setDate] = useState(new Date().toLocaleDateString('en-CA'))
   const [paidBy, setPaidBy] = useState(String(user.id))
   const [mode, setMode] = useState('equal')
   const [total, setTotal] = useState('')
@@ -92,8 +92,11 @@ export default function AddExpense() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, total, amounts, excluded, members])
 
+  const sectionLabel = SECTIONS.find(([v]) => v === section)[1]
   const foodLabel = FOODS.find(([v]) => v === foodType)[1]
-  const nameToSend = itemName.trim() || (section === 'food' ? foodLabel : '')
+  const nameToSend =
+    itemName.trim() ||
+    (section === 'food' ? foodLabel : section === 'material' ? '' : sectionLabel)
 
   async function save() {
     if (preview.error || !nameToSend) return
@@ -206,6 +209,7 @@ export default function AddExpense() {
       </section>
 
       <ErrorText text={error} />
+      {!nameToSend && <p className="text-sm text-amber-700">Enter an item description to save.</p>}
       <Button busy={busy} disabled={!!preview.error || !nameToSend} onClick={save}>Save expense</Button>
     </Page>
   )

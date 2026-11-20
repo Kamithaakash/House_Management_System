@@ -131,6 +131,28 @@ def create_settlement(db: Session, data: SettlementCreate, current_user: User) -
     if not receiver:
         raise HTTPException(status_code=404, detail="Receiver not found")
 
+    # Prevent paying more than you currently owe (accounting for pending settlements)
+    live_debts = _compute_live_debts(db)
+    owed_cents = sum(amt for u, v, amt in live_debts if u == current_user.id and v == data.to_user)
+    pending_cents = sum(
+        s.amount_cents
+        for s in db.query(Settlement)
+        .filter(
+            Settlement.from_user == current_user.id,
+            Settlement.to_user == data.to_user,
+            Settlement.status == SettlementStatus.PENDING.value,
+        )
+        .all()
+    )
+    remaining_cents = owed_cents - pending_cents
+    if remaining_cents <= 0:
+        raise HTTPException(status_code=422, detail="You have no remaining unpaid balance to this user")
+    if data.amount_cents > remaining_cents:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Amount exceeds remaining unpaid balance (Rs. {remaining_cents / 100:.2f})",
+        )
+
     settlement = Settlement(
         from_user=current_user.id,  # Always from session
         to_user=data.to_user,

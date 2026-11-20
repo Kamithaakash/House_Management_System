@@ -71,6 +71,9 @@ def test_two_party_settlement_and_security_guards():
     login("alice@test.com")
     s_id = client.post("/api/settlements", json={"to_user": 2, "amount_cents": 5000}).json()["id"]
 
+    # Duplicate pending settlement exceeding remaining balance is blocked -> 422
+    assert client.post("/api/settlements", json={"to_user": 2, "amount_cents": 1000}).status_code == 422
+
     # Security: Alice (payer) CANNOT confirm her own payment -> 403
     assert client.post(f"/api/settlements/{s_id}/confirm").status_code == 403
 
@@ -79,12 +82,18 @@ def test_two_party_settlement_and_security_guards():
     assert len(debts) == 1
     assert debts[0]["amount_cents"] == 5000
 
-    # Bob (receiver) confirms -> balance clears to 0
+    # Bob (receiver) confirms -> balance clears to 0 everywhere (Balances AND My Bill)
     login("bob@test.com")
     assert client.post(f"/api/settlements/{s_id}/confirm").status_code == 200
     assert client.get("/api/balances").json()["debts"] == []
 
+    login("alice@test.com")
+    alice_bill = client.get("/api/expenses/my-bill").json()
+    assert alice_bill["total_you_owe_cents"] == 0
+    assert alice_bill["net_cents"] == 0
+
     # Confirming twice is blocked -> 409
+    login("bob@test.com")
     assert client.post(f"/api/settlements/{s_id}/confirm").status_code == 409
 
 

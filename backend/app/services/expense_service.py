@@ -6,6 +6,7 @@ from app.constants import FoodType, Section
 from app.models import AuditLog, Expense, ExpenseSplit, User
 from app.money import split_equally, split_per_person
 from app.schemas.expenses import ExpenseCreate, ExpenseResponse, MyBillResponse, MyBillRow, SplitItemResponse
+from app.services.settlement_service import _compute_live_debts
 
 
 def _get_active_user_map(db: Session) -> dict[int, str]:
@@ -183,9 +184,6 @@ def get_my_bill(db: Session, current_user: User) -> MyBillResponse:
         splits_by_expense.setdefault(s.expense_id, []).append(s)
 
     rows = []
-    total_you_owe = 0
-    total_owed_to_you = 0
-
     for exp in expenses:
         exp_splits = splits_by_expense.get(exp.id, [])
         my_split = next((s for s in exp_splits if s.user_id == current_user.id), None)
@@ -196,12 +194,6 @@ def get_my_bill(db: Session, current_user: User) -> MyBillResponse:
 
         your_share = my_split.share_cents if my_split else 0
         you_paid = exp.paid_by == current_user.id
-
-        if you_paid:
-            # Others owe you (total minus your own share)
-            total_owed_to_you += exp.total_cents - your_share
-        else:
-            total_you_owe += your_share
 
         rows.append(
             MyBillRow(
@@ -216,6 +208,11 @@ def get_my_bill(db: Session, current_user: User) -> MyBillResponse:
                 can_delete=(exp.created_by == current_user.id or current_user.role == "admin"),
             )
         )
+
+    # Compute live totals INCLUDING confirmed settlements & manual debt redirects
+    live_debts = _compute_live_debts(db)
+    total_you_owe = sum(amt for u, _, amt in live_debts if u == current_user.id)
+    total_owed_to_you = sum(amt for _, v, amt in live_debts if v == current_user.id)
 
     return MyBillResponse(
         rows=rows,
