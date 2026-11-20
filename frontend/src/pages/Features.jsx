@@ -10,6 +10,18 @@ export default function Features() {
 
   return (
     <main className="mx-auto max-w-md px-4 py-10">
+      <header className="mb-4 flex items-center gap-3">
+        <Link to="/" className="flex items-center gap-2 font-bold text-indigo-700">
+          <img
+            src="/main-logo.png"
+            alt="Vimana logo"
+            width="36"
+            height="36"
+            className="h-9 w-9 rounded-lg object-cover shadow-sm"
+          />
+          <span>Vimana</span>
+        </Link>
+      </header>
       <h1 className="text-2xl font-bold text-indigo-700">Features of Vimana</h1>
       <p className="mt-2 text-sm text-slate-600">
         Built to remove calculation errors, missing members, and disputes over shared expenses and

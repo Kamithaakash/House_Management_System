@@ -24,7 +24,16 @@ export default function Login() {
 
   return (
     <main className="mx-auto max-w-md px-4 py-12">
-      <h1 className="text-2xl font-bold">Log in</h1>
+      <div className="flex items-center gap-3">
+        <img
+          src="/main-logo.png"
+          alt="Vimana logo"
+          width="44"
+          height="44"
+          className="h-11 w-11 rounded-xl object-cover shadow-sm"
+        />
+        <h1 className="text-2xl font-bold">Log in</h1>
+      </div>
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4 rounded-xl bg-white p-5 shadow-sm">
         <div>

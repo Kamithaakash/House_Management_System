@@ -10,6 +10,18 @@ export default function About() {
 
   return (
     <main className="mx-auto max-w-md px-4 py-10">
+      <header className="mb-4 flex items-center gap-3">
+        <Link to="/" className="flex items-center gap-2 font-bold text-indigo-700">
+          <img
+            src="/main-logo.png"
+            alt="Vimana logo"
+            width="36"
+            height="36"
+            className="h-9 w-9 rounded-lg object-cover shadow-sm"
+          />
+          <span>Vimana</span>
+        </Link>
+      </header>
       <h1 className="text-2xl font-bold text-indigo-700">About Vimana</h1>
 
       <section className="mt-4 space-y-3 rounded-xl bg-white p-5 text-sm text-slate-600 shadow-sm">

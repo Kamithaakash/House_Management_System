@@ -16,6 +16,13 @@ export default function Landing() {
 
   return (
     <main className="mx-auto max-w-md px-4 py-10 text-center">
+      <img
+        src="/main-logo.png"
+        alt="Vimana logo"
+        width="72"
+        height="72"
+        className="mx-auto mb-3 h-18 w-18 rounded-2xl object-cover shadow-sm"
+      />
       <h1 className="text-3xl font-bold text-indigo-700">Vimana</h1>
       <p className="mt-1 text-sm font-medium text-slate-500">
         Boarding House Expense &amp; Cleaning Manager

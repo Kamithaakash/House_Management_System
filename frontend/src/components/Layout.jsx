@@ -14,6 +14,17 @@ const TABS = [
 export default function Layout() {
   return (
     <div className="mx-auto min-h-screen max-w-md">
+      <header className="flex items-center gap-2 border-b border-slate-200 bg-white px-4 py-3">
+        <img
+          src="/main-logo.png"
+          alt="Vimana logo"
+          width="32"
+          height="32"
+          className="h-8 w-8 rounded-lg object-cover"
+        />
+        <span className="text-base font-bold text-indigo-700">Vimana</span>
+      </header>
+
       <main className="p-4 pb-28">
         <Suspense fallback={<p className="py-8 text-center text-sm text-slate-500">Loading...</p>}>
           <Outlet />
