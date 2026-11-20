@@ -9,7 +9,6 @@ export default function PublicFooter() {
         <Link to="/">Home</Link>
         <Link to="/features">Features</Link>
         <Link to="/about">About</Link>
-        <Link to="/faq">FAQ</Link>
         <Link to="/login">Log in</Link>
       </nav>
       <p className="mt-3 text-slate-400">© {CURRENT_YEAR} Vike Pamana • Vimana • vimana.site</p>
