@@ -1,9 +1,10 @@
+from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
 from sqlalchemy.orm import Session
-from app.routers import auth
+from app.routers import auth, expenses
 from app.config import get_settings
 from app.database import Base, engine, get_db
 import app.models  # noqa: F401 - registers all 12 tables with Base
@@ -11,12 +12,20 @@ import app.models  # noqa: F401 - registers all 12 tables with Base
 settings = get_settings()
 is_prod = settings.environment == "production"
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Create tables in Neon when the server starts (not during imports/tests)
+    Base.metadata.create_all(bind=engine)
+    yield
+
+
 # Hide /docs and /redoc in production for security
 app = FastAPI(
     title="Boarding Management System API",
     docs_url=None if is_prod else "/docs",
     redoc_url=None if is_prod else "/redoc",
     openapi_url=None if is_prod else "/openapi.json",
+    lifespan=lifespan,
 )
 
 # Strict CORS: only allow our own frontend (never "*")
@@ -48,9 +57,8 @@ async def safe_exception_handler(request: Request, exc: Exception):
     raise exc
 
 
-# Create tables in Neon if they don't exist yet
-Base.metadata.create_all(bind=engine)
 app.include_router(auth.router)
+app.include_router(expenses.router)
 
 
 @app.get("/api/health")
