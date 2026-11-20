@@ -29,7 +29,7 @@
   ],
   "headers": [
     {
-      "source": "/(dashboard|add-expense|my-bill|balances|chores|admin|api/.*)",
+      "source": "/(dashboard|add-expense|my-bill|history|balances|chores|admin|api/.*)",
       "headers": [
         { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
       ]

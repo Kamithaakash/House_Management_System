@@ -44,6 +44,7 @@ const STATIC_ROUTES = [
   { route: 'dashboard', title: 'Home | Vimana', noindex: true },
   { route: 'add-expense', title: 'Add Expense | Vimana', noindex: true },
   { route: 'my-bill', title: 'My Bill | Vimana', noindex: true },
+  { route: 'history', title: 'History | Vimana', noindex: true },
   { route: 'balances', title: 'Balances & Payments | Vimana', noindex: true },
   { route: 'chores', title: 'Cleaning Turns | Vimana', noindex: true },
   { route: 'admin', title: 'Admin | Vimana', noindex: true },

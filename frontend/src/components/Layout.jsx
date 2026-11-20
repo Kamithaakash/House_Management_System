@@ -5,7 +5,7 @@ const TABS = [
   ['/dashboard', '🏠', 'Home'],
   ['/add-expense', '➕', 'Add'],
   ['/my-bill', '🧾', 'Bill'],
-  ['/balances', '💸', 'Pay'],
+  ['/history', '📜', 'History'],
   ['/chores', '🧹', 'Chores'],
 ]
 

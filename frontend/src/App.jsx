@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import ErrorBoundary from './components/ErrorBoundary'
 import Layout from './components/Layout'
@@ -36,7 +36,7 @@ function lazyWithRetry(importer) {
 const Dashboard = lazyWithRetry(() => import('./pages/Dashboard'))
 const AddExpense = lazyWithRetry(() => import('./pages/AddExpense'))
 const MyBill = lazyWithRetry(() => import('./pages/MyBill'))
-const Balances = lazyWithRetry(() => import('./pages/Balances'))
+const History = lazyWithRetry(() => import('./pages/History'))
 const Chores = lazyWithRetry(() => import('./pages/Chores'))
 const Admin = lazyWithRetry(() => import('./pages/Admin'))
 
@@ -62,7 +62,8 @@ export default function App() {
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/add-expense" element={<AddExpense />} />
                 <Route path="/my-bill" element={<MyBill />} />
-                <Route path="/balances" element={<Balances />} />
+                <Route path="/history" element={<History />} />
+                <Route path="/balances" element={<Navigate to="/my-bill" replace />} />
                 <Route path="/chores" element={<Chores />} />
                 <Route path="/admin" element={<ProtectedRoute adminOnly><Admin /></ProtectedRoute>} />
               </Route>

@@ -5,6 +5,7 @@ from app.database import get_db
 from app.models import User
 from app.schemas.settlements import (
     BalancesOverviewResponse,
+    BillBreakdownResponse,
     DebtRedirectCreate,
     RedirectNoticeResponse,
     SettlementCreate,
@@ -22,6 +23,14 @@ def get_balances(
     db: Session = Depends(get_db),
 ):
     return settlement_service.get_balances_overview(db, current_user)
+
+
+@router.get("/bill/breakdown", response_model=BillBreakdownResponse)
+def get_bill_breakdown(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    return settlement_service.get_bill_breakdown(db, current_user)
 
 
 @router.post("/settlements", response_model=SettlementResponse, status_code=status.HTTP_201_CREATED)

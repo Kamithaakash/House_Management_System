@@ -56,3 +56,30 @@ class BalancesOverviewResponse(BaseModel):
     debts: list[DebtItemResponse]
     pending_settlements: list[SettlementResponse]
     redirect_notices: list[RedirectNoticeResponse]
+
+
+class PersonBreakdownItem(BaseModel):
+    kind: str  # 'expense' | 'settlement' | 'redirect'
+    item_date: str
+    title: str
+    subtitle: str
+    signed_cents: int  # positive = in your favor, negative = you owe
+
+
+class PersonBillCardResponse(BaseModel):
+    other_user_id: int
+    other_user_name: str
+    direction: str  # 'you_owe' | 'owes_you'
+    net_cents: int
+    pending_sent_cents: int
+    items: list[PersonBreakdownItem]
+
+
+class BillBreakdownResponse(BaseModel):
+    total_you_owe_cents: int
+    total_owed_to_you_cents: int
+    person_cards: list[PersonBillCardResponse]
+    pending_settlements: list[SettlementResponse]
+    history_settlements: list[SettlementResponse]
+    redirect_notices: list[RedirectNoticeResponse]
+    other_debts: list[DebtItemResponse]

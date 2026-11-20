@@ -140,3 +140,14 @@ def test_manual_debt_redirect_and_transparency_notice():
     assert overview["debts"][0]["to_user"] == 3
     assert overview["debts"][0]["amount_cents"] == 5000
     assert "Bob transferred Rs. 50.00 from Alice to Charlie" in overview["redirect_notices"][0]["message"]
+
+    # Person-wise breakdown for Alice shows Charlie card with exact redirect item summing to -5000
+    breakdown = client.get("/api/bill/breakdown").json()
+    assert breakdown["total_you_owe_cents"] == 5000
+    assert len(breakdown["person_cards"]) == 1
+    card = breakdown["person_cards"][0]
+    assert card["other_user_name"] == "Charlie"
+    assert card["direction"] == "you_owe"
+    assert card["net_cents"] == 5000
+    assert sum(item["signed_cents"] for item in card["items"]) == -5000
+    assert card["items"][0]["kind"] == "redirect"

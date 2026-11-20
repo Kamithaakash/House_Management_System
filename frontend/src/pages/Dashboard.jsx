@@ -64,13 +64,13 @@ export default function Dashboard() {
       </section>
 
       {hasRedirectOption && (
-        <Link to="/balances" className="block rounded-xl bg-indigo-100 p-4 text-sm font-medium text-indigo-900">
-          Someone owes you and you owe someone else. Open the <strong>Pay</strong> tab to redirect your payment!
+        <Link to="/my-bill" className="block rounded-xl bg-indigo-100 p-4 text-sm font-medium text-indigo-900">
+          Someone owes you and you owe someone else. Open the <strong>Bill</strong> tab to redirect your payment!
         </Link>
       )}
 
       {toConfirm > 0 && (
-        <Link to="/balances" className="block rounded-xl bg-amber-100 p-4 font-medium text-amber-900">
+        <Link to="/my-bill" className="block rounded-xl bg-amber-100 p-4 font-medium text-amber-900">
           {toConfirm} payment(s) waiting for your confirmation
         </Link>
       )}
