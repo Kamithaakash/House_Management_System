@@ -109,7 +109,7 @@ export default defineConfig({
         orientation: 'portrait',
         scope: '/',
         start_url: '/',
-        theme_color: '#4f46e5',
+        theme_color: '#9c021e',
         background_color: '#ffffff',
         icons: [
           { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
@@ -121,7 +121,7 @@ export default defineConfig({
         cleanupOutdatedCaches: true,
         skipWaiting: true,
         clientsClaim: true,
-        globPatterns: ['**/*.{js,css,svg,png,ico}', 'index.html'],
+        globPatterns: ['**/*.{js,css,svg,png,webp,ico}', 'index.html'],
         navigateFallbackDenylist: [/^\/api/],
       },
     }),
