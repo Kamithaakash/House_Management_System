@@ -10,9 +10,9 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'Boarding Management System',
-        short_name: 'Boarding',
-        description: 'Share house expenses, settle payments and manage cleaning turns.',
+        name: 'Vimana — Boarding Manager',
+        short_name: 'Vimana',
+        description: 'Vimana helps boarding houses share expenses, settle payments and manage cleaning turns.',
         display: 'standalone',
         orientation: 'portrait',
         scope: '/',

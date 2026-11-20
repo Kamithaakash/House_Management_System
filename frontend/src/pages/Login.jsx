@@ -6,7 +6,7 @@ import useAction from '../hooks/useAction'
 import usePageMeta from '../hooks/usePageMeta'
 
 export default function Login() {
-  usePageMeta('Log in | Boarding Management System', 'Log in to your boarding house account.')
+  usePageMeta('Log in | Vimana', 'Log in to your Vimana boarding house account.')
 
   const { user, login } = useAuth()
   const navigate = useNavigate()

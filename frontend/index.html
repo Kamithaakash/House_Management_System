@@ -8,30 +8,57 @@
     <meta name="theme-color" content="#4f46e5" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-title" content="Boarding" />
+    <meta name="apple-mobile-web-app-title" content="Vimana" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 
-    <title>Boarding Management System | Share Expenses &amp; Cleaning Turns</title>
+    <title>Vimana — Boarding House Expense &amp; Cleaning Manager</title>
     <meta
       name="description"
-      content="A simple app for boarding houses to split food and bills fairly, confirm payments and rotate cleaning duties."
+      content="Vimana is a simple web app for boarding houses to split food, electricity, water, and monthly bills fairly, confirm payments, and manage cleaning turns."
     />
 
-    <!-- Link preview card (WhatsApp, Facebook) -->
+    <!-- Canonical & Link preview card (Google, WhatsApp, Facebook) -->
     <link rel="canonical" href="https://vimana.site/" />
+    <meta property="og:site_name" content="Vimana" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://vimana.site/" />
-    <meta property="og:title" content="Boarding Management System" />
+    <meta property="og:title" content="Vimana — Boarding House Expense & Cleaning Manager" />
     <meta
       property="og:description"
-      content="Split house expenses fairly, confirm payments and rotate cleaning duties."
+      content="Vimana helps boarding houses split food and bills fairly, confirm payments, and rotate cleaning duties."
     />
     <meta property="og:image" content="https://vimana.site/og-image.png" />
     <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Structured Data (tells Google your brand name is "Vimana") -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "name": "Vimana",
+            "alternateName": "Vimana Boarding",
+            "url": "https://vimana.site/"
+          },
+          {
+            "@type": "WebApplication",
+            "name": "Vimana",
+            "url": "https://vimana.site/",
+            "applicationCategory": "LifestyleApplication",
+            "operatingSystem": "All",
+            "description": "Vimana is a mobile-friendly boarding house management web app for fair expense splits, two-party payment confirmation, and group cleaning rotations."
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
-    <noscript>Boarding Management System needs JavaScript to run.</noscript>
+    <noscript>
+      Vimana — Boarding House Expense &amp; Cleaning Manager (https://vimana.site). Please enable
+      JavaScript to use the app.
+    </noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
