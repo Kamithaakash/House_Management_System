@@ -12,10 +12,15 @@ from app.schemas.auth import (
     UserResponse,
 )
 from app.security import (
+    ACCESS_TOKEN_EXPIRE_MINUTES,
     COOKIE_NAME,
+    REFRESH_COOKIE_NAME,
+    REFRESH_TOKEN_EXPIRE_DAYS,
     check_rate_limit,
     clear_failed_logins,
     create_access_token,
+    create_refresh_token,
+    decode_refresh_token,
     get_current_user,
     hash_password,
     record_failed_login,
@@ -25,6 +30,29 @@ from app.security import (
 
 router = APIRouter(prefix="/api", tags=["Auth & Members"])
 settings = get_settings()
+
+
+def _set_auth_cookies(response: Response, user_id: int) -> None:
+    """Save short-lived access cookie + 30-day persistent refresh cookie (HttpOnly)."""
+    is_prod = settings.environment == "production"
+    response.set_cookie(
+        key=COOKIE_NAME,
+        value=create_access_token(user_id),
+        httponly=True,
+        secure=is_prod,
+        samesite="lax",
+        path="/",
+        max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+    )
+    response.set_cookie(
+        key=REFRESH_COOKIE_NAME,
+        value=create_refresh_token(user_id),
+        httponly=True,
+        secure=is_prod,
+        samesite="lax",
+        path="/api",
+        max_age=REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
+    )
 
 
 @router.post("/auth/login", response_model=UserResponse)
@@ -46,27 +74,34 @@ def login(data: LoginRequest, request: Request, response: Response, db: Session 
         )
 
     clear_failed_logins(rate_key)
-    token = create_access_token(user.id)
+    _set_auth_cookies(response, user.id)
+    return user
 
-    response.set_cookie(
-        key=COOKIE_NAME,
-        value=token,
-        httponly=True,
-        secure=settings.environment == "production",
-        samesite="lax",
-        max_age=1800,  # 30 minutes
-    )
+
+@router.post("/auth/refresh", response_model=UserResponse)
+def refresh_session(request: Request, response: Response, db: Session = Depends(get_db)):
+    """Silently renews login from the 30-day HttpOnly refresh cookie when reopening the app."""
+    refresh_token = request.cookies.get(REFRESH_COOKIE_NAME)
+    if not refresh_token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Session expired")
+
+    user_id = decode_refresh_token(refresh_token)
+    if user_id is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Session expired")
+
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user or not user.is_active:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User account is inactive")
+
+    _set_auth_cookies(response, user.id)
     return user
 
 
 @router.post("/auth/logout")
 def logout(response: Response):
-    response.delete_cookie(
-        key=COOKIE_NAME,
-        httponly=True,
-        secure=settings.environment == "production",
-        samesite="lax",
-    )
+    is_prod = settings.environment == "production"
+    response.delete_cookie(key=COOKIE_NAME, httponly=True, secure=is_prod, samesite="lax", path="/")
+    response.delete_cookie(key=REFRESH_COOKIE_NAME, httponly=True, secure=is_prod, samesite="lax", path="/api")
     return {"detail": "Logged out"}
 
 

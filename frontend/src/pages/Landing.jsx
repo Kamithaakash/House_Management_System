@@ -1,5 +1,6 @@
-import { Link } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import InstallPrompt from '../components/InstallPrompt'
+import { useAuth } from '../context/AuthContext'
 import usePageMeta from '../hooks/usePageMeta'
 
 export default function Landing() {
@@ -7,6 +8,10 @@ export default function Landing() {
     'Vimana — Boarding House Expense & Cleaning Manager',
     'Vimana is a simple web app for boarding houses to split food, electricity, water, and monthly bills fairly, confirm payments, and manage cleaning turns.',
   )
+
+  const { user } = useAuth()
+  // If already logged in via saved cookie, jump straight into the app when opening from phone home screen
+  if (user) return <Navigate to="/dashboard" replace />
 
   return (
     <main className="mx-auto max-w-md px-4 py-10 text-center">

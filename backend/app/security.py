@@ -16,7 +16,9 @@ password_hasher = PasswordHash.recommended()  # Uses Argon2id
 
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+REFRESH_TOKEN_EXPIRE_DAYS = 30
 COOKIE_NAME = "access_token"
+REFRESH_COOKIE_NAME = "refresh_token"
 
 # Simple in-memory login rate limiter: key -> list of failed attempt timestamps
 _failed_logins: dict[str, list[float]] = defaultdict(list)
@@ -34,17 +36,33 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 def create_access_token(user_id: int) -> str:
     expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    payload = {"sub": str(user_id), "exp": expire}
+    payload = {"sub": str(user_id), "type": "access", "exp": expire}
     return jwt.encode(payload, settings.secret_key, algorithm=ALGORITHM)
 
 
-def decode_access_token(token: str) -> int | None:
+def create_refresh_token(user_id: int) -> str:
+    expire = datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+    payload = {"sub": str(user_id), "type": "refresh", "exp": expire}
+    return jwt.encode(payload, settings.secret_key, algorithm=ALGORITHM)
+
+
+def decode_token(token: str, expected_type: str = "access") -> int | None:
     try:
         payload = jwt.decode(token, settings.secret_key, algorithms=[ALGORITHM])
+        if payload.get("type") != expected_type:
+            return None
         user_id = payload.get("sub")
         return int(user_id) if user_id is not None else None
     except (jwt.PyJWTError, ValueError):
         return None
+
+
+def decode_access_token(token: str) -> int | None:
+    return decode_token(token, expected_type="access")
+
+
+def decode_refresh_token(token: str) -> int | None:
+    return decode_token(token, expected_type="refresh")
 
 
 def check_rate_limit(key: str) -> None:

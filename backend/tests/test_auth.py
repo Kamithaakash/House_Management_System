@@ -110,3 +110,22 @@ def test_login_rate_limit():
 
     blocked = client.post("/api/auth/login", json={"email": "member@test.com", "password": "MemberPass123!"})
     assert blocked.status_code == 429
+
+
+def test_refresh_cookie_keeps_user_logged_in_and_logout_clears_both():
+    login_res = client.post("/api/auth/login", json={"email": "member@test.com", "password": "MemberPass123!"})
+    assert login_res.status_code == 200
+
+    # Simulate short-lived access_token expiring while 30-day refresh_token remains
+    client.cookies.delete("access_token")
+    assert client.get("/api/auth/me").status_code == 401
+
+    # Refresh rotates a new access_token cookie cleanly
+    ref = client.post("/api/auth/refresh")
+    assert ref.status_code == 200
+    assert ref.json()["email"] == "member@test.com"
+    assert client.get("/api/auth/me").status_code == 200
+
+    # Logout clears both cookies
+    assert client.post("/api/auth/logout").status_code == 200
+    assert client.post("/api/auth/refresh").status_code == 401
