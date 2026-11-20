@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
 from sqlalchemy.orm import Session
-
+from app.routers import auth
 from app.config import get_settings
 from app.database import Base, engine, get_db
 import app.models  # noqa: F401 - registers all 12 tables with Base
@@ -50,6 +50,7 @@ async def safe_exception_handler(request: Request, exc: Exception):
 
 # Create tables in Neon if they don't exist yet
 Base.metadata.create_all(bind=engine)
+app.include_router(auth.router)
 
 
 @app.get("/api/health")
