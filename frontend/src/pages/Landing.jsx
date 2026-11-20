@@ -1,9 +1,8 @@
 import { Link, Navigate } from 'react-router-dom'
 import InstallPrompt from '../components/InstallPrompt'
+import PublicFooter from '../components/PublicFooter'
 import { useAuth } from '../context/AuthContext'
 import usePageMeta from '../hooks/usePageMeta'
-
-const CURRENT_YEAR = new Date().getFullYear()
 
 export default function Landing() {
   usePageMeta(
@@ -57,9 +56,7 @@ export default function Landing() {
         <InstallPrompt />
       </div>
 
-      <footer className="mt-10 text-xs text-slate-400">
-        © {CURRENT_YEAR} Vike Pamana • Vimana • vimana.site
-      </footer>
+      <PublicFooter />
     </main>
   )
 }
