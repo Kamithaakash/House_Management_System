@@ -151,3 +151,44 @@ def test_manual_debt_redirect_and_transparency_notice():
     assert card["net_cents"] == 5000
     assert sum(item["signed_cents"] for item in card["items"]) == -5000
     assert card["items"][0]["kind"] == "redirect"
+
+
+def test_breakdown_hides_settled_transactions_and_shows_only_open_mutual_offset():
+    # Old cycle: Bob (2) pays Rs. 50 for Alice (1), Alice pays Bob Rs. 50 and Bob confirms -> settled!
+    login("bob@test.com")
+    client.post("/api/expenses", json={
+        "paid_by": 2, "section": "food", "item_name": "Old Lunch", "food_type": "kottu",
+        "expense_date": "2026-11-20", "split_mode": "per_person", "per_person_cents": {"1": 5000},
+    })
+    login("alice@test.com")
+    s_id = client.post("/api/settlements", json={"to_user": 2, "amount_cents": 5000}).json()["id"]
+    login("bob@test.com")
+    client.post(f"/api/settlements/{s_id}/confirm")
+
+    # New unsettled cycle: Bob pays Rs. 50 for Alice, Alice pays Rs. 20 for Bob -> Net Rs. 30
+    client.post("/api/expenses", json={
+        "paid_by": 2, "section": "food", "item_name": "New Rice & Curry", "food_type": "rice_curry",
+        "curry_type": "fish", "expense_date": "2026-11-20",
+        "split_mode": "per_person", "per_person_cents": {"1": 5000},
+    })
+    login("alice@test.com")
+    client.post("/api/expenses", json={
+        "paid_by": 1, "section": "material", "item_name": "Dish Soap",
+        "expense_date": "2026-11-20", "split_mode": "per_person", "per_person_cents": {"2": 2000},
+    })
+
+    # Alice's dropdown for Bob must show ONLY the 2 unsettled items (NOT Old Lunch, NOT Cash payment)
+    alice_card = client.get("/api/bill/breakdown").json()["person_cards"][0]
+    assert alice_card["net_cents"] == 3000
+    assert alice_card["direction"] == "you_owe"
+    titles = {item["title"] for item in alice_card["items"]}
+    assert titles == {"New Rice & Curry", "Dish Soap"}
+    assert sum(item["signed_cents"] for item in alice_card["items"]) == -3000
+
+    # Bob's dropdown for Alice also shows ONLY those same 2 unsettled items (sum = +3000)
+    login("bob@test.com")
+    bob_card = client.get("/api/bill/breakdown").json()["person_cards"][0]
+    assert bob_card["net_cents"] == 3000
+    assert bob_card["direction"] == "owes_you"
+    assert {item["title"] for item in bob_card["items"]} == {"New Rice & Curry", "Dish Soap"}
+    assert sum(item["signed_cents"] for item in bob_card["items"]) == 3000

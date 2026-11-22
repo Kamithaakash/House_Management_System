@@ -127,10 +127,117 @@ def get_balances_overview(db: Session, current_user: User) -> BalancesOverviewRe
     )
 
 
+def _filter_open_items(
+    raw_items: list[tuple[PersonBreakdownItem, bool, int]],
+    target_net: int,
+) -> list[PersonBreakdownItem]:
+    """
+    Keep ONLY unsettled items explaining `target_net` between two users.
+    raw_items: list of (item, is_clearance, sort_id)
+      - is_clearance=False: expenses and incoming redirects (reasons money is owed)
+      - is_clearance=True:  confirmed cash settlements and outgoing redirects (payments that settle debts)
+    """
+    # Order oldest -> newest so confirmed payments cancel the oldest bills first (FIFO)
+    ordered = sorted(raw_items, key=lambda x: (x[0].item_date, x[2]))
+
+    open_neg: list[PersonBreakdownItem] = []
+    open_pos: list[PersonBreakdownItem] = []
+    clear_net = 0
+    had_clearances = False
+    last_clear_date = ""
+
+    for item, is_clearance, _ in ordered:
+        if is_clearance:
+            had_clearances = True
+            clear_net += item.signed_cents
+            last_clear_date = item.item_date
+        else:
+            if item.signed_cents < 0:
+                open_neg.append(item)
+            elif item.signed_cents > 0:
+                open_pos.append(item)
+
+    def _find_zero_prefix(neg_list: list[PersonBreakdownItem], pos_list: list[PersonBreakdownItem], offset: int) -> tuple[int, int] | None:
+        """Find largest oldest prefix (i, j) where sum(neg[:i]) + sum(pos[:j]) + offset == 0."""
+        pos_by_sum: dict[int, int] = {0: 0}
+        running_pos = 0
+        for j, item in enumerate(pos_list, start=1):
+            running_pos += item.signed_cents
+            pos_by_sum[running_pos] = j
+
+        best: tuple[int, int] | None = None
+        running_neg = 0
+        for i in range(len(neg_list) + 1):
+            if i > 0:
+                running_neg += neg_list[i - 1].signed_cents
+            needed_pos = -running_neg - offset
+            if needed_pos in pos_by_sum:
+                j = pos_by_sum[needed_pos]
+                if i + j > 0 and (best is None or (i + j) > (best[0] + best[1])):
+                    best = (i, j)
+        return best
+
+    # 1. Drop the largest oldest settled prefix that balances to 0 with confirmed clearances
+    if had_clearances:
+        match = _find_zero_prefix(open_neg, open_pos, clear_net)
+        if match is not None:
+            cut_neg, cut_pos = match
+            open_neg = open_neg[cut_neg:]
+            open_pos = open_pos[cut_pos:]
+            clear_net = 0
+        else:
+            # Drop any older zero-sum bill prefix before applying partial clearance
+            bill_match = _find_zero_prefix(open_neg, open_pos, 0)
+            if bill_match is not None:
+                cut_neg, cut_pos = bill_match
+                open_neg = open_neg[cut_neg:]
+                open_pos = open_pos[cut_pos:]
+    else:
+        # Even without cash settlements, hide older bills from an earlier date that already mutually canceled to 0
+        bill_match = _find_zero_prefix(open_neg, open_pos, 0)
+        if bill_match is not None:
+            cut_neg, cut_pos = bill_match
+            rem_dates = [x.item_date for x in open_neg[cut_neg:]] + [x.item_date for x in open_pos[cut_pos:]]
+            old_dates = [x.item_date for x in open_neg[:cut_neg]] + [x.item_date for x in open_pos[:cut_pos]]
+            if rem_dates and old_dates and max(old_dates) < min(rem_dates):
+                open_neg = open_neg[cut_neg:]
+                open_pos = open_pos[cut_pos:]
+
+    # 2. If a partial clearance remains, cancel oldest matching bills one by one (FIFO)
+    while open_neg and clear_net >= -open_neg[0].signed_cents:
+        clear_net += open_neg[0].signed_cents
+        open_neg.pop(0)
+    while open_pos and -clear_net >= open_pos[0].signed_cents:
+        clear_net += open_pos[0].signed_cents
+        open_pos.pop(0)
+
+    result: list[PersonBreakdownItem] = []
+    result.extend(open_neg)
+    result.extend(open_pos)
+
+    # 3. If a partial payment still remains on an open bill, show it cleanly so math adds up to the exact cent
+    if clear_net != 0:
+        result.append(
+            PersonBreakdownItem(
+                kind="settlement",
+                item_date=last_clear_date,
+                title="Partly settled",
+                subtitle="Confirmed payment / redirect already applied",
+                signed_cents=clear_net,
+            )
+        )
+
+    # Safety check: items shown MUST equal the exact net amount on the card
+    if sum(x.signed_cents for x in result) != target_net:
+        return [item for item, _, _ in reversed(ordered)]
+
+    return sorted(result, key=lambda x: x.item_date, reverse=True)
+
+
 def get_bill_breakdown(db: Session, current_user: User) -> BillBreakdownResponse:
     """
     Person-wise bill breakdown for current_user (strictly private to current_user).
-    Every person card's items sum to the exact live net amount between current_user and that person.
+    Shows ONLY remaining unsettled transactions explaining each person's live net amount.
     """
     me = current_user.id
     user_map = _get_user_map(db)
@@ -155,13 +262,13 @@ def get_bill_breakdown(db: Session, current_user: User) -> BillBreakdownResponse
                 )
             )
 
-    # 2. Collect itemized breakdown only for people with an active balance
-    items_by_other: dict[int, list[PersonBreakdownItem]] = {uid: [] for uid in my_pair_net}
+    # 2. Collect itemized breakdown (item, is_clearance, sort_id) for people with an active balance
+    items_by_other: dict[int, list[tuple[PersonBreakdownItem, bool, int]]] = {uid: [] for uid in my_pair_net}
 
     if items_by_other:
-        # Expenses involving me and one of those active people
         split_rows = (
             db.query(
+                Expense.id,
                 Expense.expense_date,
                 Expense.item_name,
                 Expense.section,
@@ -174,35 +281,39 @@ def get_bill_breakdown(db: Session, current_user: User) -> BillBreakdownResponse
                 Expense.deleted_at.is_(None),
                 (Expense.paid_by == me) | (ExpenseSplit.user_id == me),
             )
-            .order_by(Expense.expense_date.desc(), Expense.id.desc())
+            .order_by(Expense.expense_date.asc(), Expense.id.asc())
             .all()
         )
-        for exp_date, item_name, section, paid_by, participant, share in split_rows:
+        for exp_id, exp_date, item_name, section, paid_by, participant, share in split_rows:
             if paid_by == participant or share == 0:
                 continue
             if paid_by == me and participant in items_by_other:
-                items_by_other[participant].append(
+                items_by_other[participant].append((
                     PersonBreakdownItem(
                         kind="expense",
                         item_date=str(exp_date),
                         title=item_name,
                         subtitle=f"You paid ({section.replace('_', ' ')})",
                         signed_cents=share,
-                    )
-                )
+                    ),
+                    False,
+                    exp_id,
+                ))
             elif participant == me and paid_by in items_by_other:
                 other_name = user_map.get(paid_by, "Unknown")
-                items_by_other[paid_by].append(
+                items_by_other[paid_by].append((
                     PersonBreakdownItem(
                         kind="expense",
                         item_date=str(exp_date),
                         title=item_name,
                         subtitle=f"Paid by {other_name} ({section.replace('_', ' ')})",
                         signed_cents=-share,
-                    )
-                )
+                    ),
+                    False,
+                    exp_id,
+                ))
 
-    # 3. Settlements involving me (for both breakdown & History tab)
+    # 3. Settlements involving me (for both FIFO cancellation & History tab)
     my_settlements = (
         db.query(Settlement)
         .filter((Settlement.from_user == me) | (Settlement.to_user == me))
@@ -219,27 +330,31 @@ def get_bill_breakdown(db: Session, current_user: User) -> BillBreakdownResponse
                 pending_sent_by_other[s.to_user] = pending_sent_by_other.get(s.to_user, 0) + s.amount_cents
         elif s.status == SettlementStatus.CONFIRMED.value:
             if s.from_user == me and s.to_user in items_by_other:
-                items_by_other[s.to_user].append(
+                items_by_other[s.to_user].append((
                     PersonBreakdownItem(
                         kind="settlement",
                         item_date=str((s.confirmed_at or s.created_at).date()),
                         title="Cash payment confirmed",
                         subtitle=f"You paid {user_map.get(s.to_user, 'Unknown')}",
                         signed_cents=s.amount_cents,
-                    )
-                )
+                    ),
+                    True,
+                    s.id,
+                ))
             elif s.to_user == me and s.from_user in items_by_other:
-                items_by_other[s.from_user].append(
+                items_by_other[s.from_user].append((
                     PersonBreakdownItem(
                         kind="settlement",
                         item_date=str((s.confirmed_at or s.created_at).date()),
                         title="Cash payment confirmed",
                         subtitle=f"{user_map.get(s.from_user, 'Unknown')} paid you",
                         signed_cents=-s.amount_cents,
-                    )
-                )
+                    ),
+                    True,
+                    s.id,
+                ))
 
-    # 4. Debt redirects involving me (for both breakdown & History tab)
+    # 4. Debt redirects involving me (outgoing redirects clear debt; incoming redirects create debt)
     all_transfers = db.query(DebtTransfer).order_by(DebtTransfer.created_at.desc()).all()
     notices = []
     for t in all_transfers:
@@ -265,71 +380,84 @@ def get_bill_breakdown(db: Session, current_user: User) -> BillBreakdownResponse
                 )
             )
 
-        # Pairwise effects on active cards
+        # Outgoing/clearing sides of a redirect (is_clearance=True)
         if t.from_debtor == me and t.via_middleman in items_by_other:
-            items_by_other[t.via_middleman].append(
+            items_by_other[t.via_middleman].append((
                 PersonBreakdownItem(
                     kind="redirect",
                     item_date=t_date,
                     title=f"Redirected to {c_name}",
                     subtitle=f"{b_name} moved your debt to {c_name}",
                     signed_cents=t.amount_cents,
-                )
-            )
+                ),
+                True,
+                t.id,
+            ))
         if t.via_middleman == me and t.from_debtor in items_by_other:
-            items_by_other[t.from_debtor].append(
+            items_by_other[t.from_debtor].append((
                 PersonBreakdownItem(
                     kind="redirect",
                     item_date=t_date,
                     title=f"Redirected to {c_name}",
                     subtitle=f"You moved {a_name}'s debt to {c_name}",
                     signed_cents=-t.amount_cents,
-                )
-            )
+                ),
+                True,
+                t.id,
+            ))
         if t.via_middleman == me and t.to_creditor in items_by_other:
-            items_by_other[t.to_creditor].append(
+            items_by_other[t.to_creditor].append((
                 PersonBreakdownItem(
                     kind="redirect",
                     item_date=t_date,
                     title=f"Redirected from {a_name}",
                     subtitle=f"You redirected {a_name} to pay {c_name}",
                     signed_cents=t.amount_cents,
-                )
-            )
+                ),
+                True,
+                t.id,
+            ))
         if t.to_creditor == me and t.via_middleman in items_by_other:
-            items_by_other[t.via_middleman].append(
+            items_by_other[t.via_middleman].append((
                 PersonBreakdownItem(
                     kind="redirect",
                     item_date=t_date,
                     title=f"Redirected from {a_name}",
                     subtitle=f"{b_name} redirected {a_name} to pay you",
                     signed_cents=-t.amount_cents,
-                )
-            )
+                ),
+                True,
+                t.id,
+            ))
+        # Incoming side that creates a debt between A and C (is_clearance=False -> must be shown!)
         if t.from_debtor == me and t.to_creditor in items_by_other:
-            items_by_other[t.to_creditor].append(
+            items_by_other[t.to_creditor].append((
                 PersonBreakdownItem(
                     kind="redirect",
                     item_date=t_date,
                     title=f"Redirected by {b_name}",
                     subtitle=f"{b_name} owed {c_name}, so your debt to {b_name} moved here",
                     signed_cents=-t.amount_cents,
-                )
-            )
+                ),
+                False,
+                t.id,
+            ))
         if t.to_creditor == me and t.from_debtor in items_by_other:
-            items_by_other[t.from_debtor].append(
+            items_by_other[t.from_debtor].append((
                 PersonBreakdownItem(
                     kind="redirect",
                     item_date=t_date,
                     title=f"Redirected by {b_name}",
                     subtitle=f"{a_name} owed {b_name}, so {b_name} redirected {a_name} to pay you",
                     signed_cents=t.amount_cents,
-                )
-            )
+                ),
+                False,
+                t.id,
+            ))
 
     person_cards = []
     for other_id, net in sorted(my_pair_net.items(), key=lambda pair: (pair[1] > 0, -abs(pair[1]))):
-        card_items = sorted(items_by_other[other_id], key=lambda x: x.item_date, reverse=True)
+        card_items = _filter_open_items(items_by_other[other_id], target_net=net)
         person_cards.append(
             PersonBillCardResponse(
                 other_user_id=other_id,
