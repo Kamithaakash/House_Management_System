@@ -183,6 +183,14 @@ def get_my_bill(db: Session, current_user: User) -> MyBillResponse:
     for s in all_splits:
         splits_by_expense.setdefault(s.expense_id, []).append(s)
 
+    # Fetch creation timestamps from audit log so same-day bills and payments sort newest-first
+    audit_rows = (
+        db.query(AuditLog.entity_id, AuditLog.created_at)
+        .filter(AuditLog.entity == "expense", AuditLog.action == "create_expense")
+        .all()
+    )
+    created_at_by_expense = {eid: ts for eid, ts in audit_rows}
+
     rows = []
     for exp in expenses:
         exp_splits = splits_by_expense.get(exp.id, [])
@@ -199,6 +207,7 @@ def get_my_bill(db: Session, current_user: User) -> MyBillResponse:
             MyBillRow(
                 expense_id=exp.id,
                 expense_date=exp.expense_date,
+                created_at=created_at_by_expense.get(exp.id),
                 section=exp.section,
                 item_name=exp.item_name,
                 paid_by_name=user_map.get(exp.paid_by, "Unknown"),

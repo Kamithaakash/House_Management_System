@@ -140,28 +140,34 @@ def _filter_open_items(
     # Order oldest -> newest so confirmed payments cancel the oldest bills first (FIFO)
     ordered = sorted(raw_items, key=lambda x: (x[0].item_date, x[2]))
 
-    open_neg: list[PersonBreakdownItem] = []
-    open_pos: list[PersonBreakdownItem] = []
+    open_neg: list[tuple[PersonBreakdownItem, int]] = []
+    open_pos: list[tuple[PersonBreakdownItem, int]] = []
     clear_net = 0
     had_clearances = False
     last_clear_date = ""
+    last_clear_sort_id = 0
 
-    for item, is_clearance, _ in ordered:
+    for item, is_clearance, sort_id in ordered:
         if is_clearance:
             had_clearances = True
             clear_net += item.signed_cents
             last_clear_date = item.item_date
+            last_clear_sort_id = sort_id
         else:
             if item.signed_cents < 0:
-                open_neg.append(item)
+                open_neg.append((item, sort_id))
             elif item.signed_cents > 0:
-                open_pos.append(item)
+                open_pos.append((item, sort_id))
 
-    def _find_zero_prefix(neg_list: list[PersonBreakdownItem], pos_list: list[PersonBreakdownItem], offset: int) -> tuple[int, int] | None:
+    def _find_zero_prefix(
+        neg_list: list[tuple[PersonBreakdownItem, int]],
+        pos_list: list[tuple[PersonBreakdownItem, int]],
+        offset: int,
+    ) -> tuple[int, int] | None:
         """Find largest oldest prefix (i, j) where sum(neg[:i]) + sum(pos[:j]) + offset == 0."""
         pos_by_sum: dict[int, int] = {0: 0}
         running_pos = 0
-        for j, item in enumerate(pos_list, start=1):
+        for j, (item, _) in enumerate(pos_list, start=1):
             running_pos += item.signed_cents
             pos_by_sum[running_pos] = j
 
@@ -169,7 +175,7 @@ def _filter_open_items(
         running_neg = 0
         for i in range(len(neg_list) + 1):
             if i > 0:
-                running_neg += neg_list[i - 1].signed_cents
+                running_neg += neg_list[i - 1][0].signed_cents
             needed_pos = -running_neg - offset
             if needed_pos in pos_by_sum:
                 j = pos_by_sum[needed_pos]
@@ -197,41 +203,46 @@ def _filter_open_items(
         bill_match = _find_zero_prefix(open_neg, open_pos, 0)
         if bill_match is not None:
             cut_neg, cut_pos = bill_match
-            rem_dates = [x.item_date for x in open_neg[cut_neg:]] + [x.item_date for x in open_pos[cut_pos:]]
-            old_dates = [x.item_date for x in open_neg[:cut_neg]] + [x.item_date for x in open_pos[:cut_pos]]
+            rem_dates = [x.item_date for x, _ in open_neg[cut_neg:]] + [x.item_date for x, _ in open_pos[cut_pos:]]
+            old_dates = [x.item_date for x, _ in open_neg[:cut_neg]] + [x.item_date for x, _ in open_pos[:cut_pos]]
             if rem_dates and old_dates and max(old_dates) < min(rem_dates):
                 open_neg = open_neg[cut_neg:]
                 open_pos = open_pos[cut_pos:]
 
     # 2. If a partial clearance remains, cancel oldest matching bills one by one (FIFO)
-    while open_neg and clear_net >= -open_neg[0].signed_cents:
-        clear_net += open_neg[0].signed_cents
+    while open_neg and clear_net >= -open_neg[0][0].signed_cents:
+        clear_net += open_neg[0][0].signed_cents
         open_neg.pop(0)
-    while open_pos and -clear_net >= open_pos[0].signed_cents:
-        clear_net += open_pos[0].signed_cents
+    while open_pos and -clear_net >= open_pos[0][0].signed_cents:
+        clear_net += open_pos[0][0].signed_cents
         open_pos.pop(0)
 
-    result: list[PersonBreakdownItem] = []
-    result.extend(open_neg)
-    result.extend(open_pos)
+    result_with_order: list[tuple[PersonBreakdownItem, int]] = []
+    result_with_order.extend(open_neg)
+    result_with_order.extend(open_pos)
 
     # 3. If a partial payment still remains on an open bill, show it cleanly so math adds up to the exact cent
     if clear_net != 0:
-        result.append(
-            PersonBreakdownItem(
-                kind="settlement",
-                item_date=last_clear_date,
-                title="Partly settled",
-                subtitle="Confirmed payment / redirect already applied",
-                signed_cents=clear_net,
+        result_with_order.append(
+            (
+                PersonBreakdownItem(
+                    kind="settlement",
+                    item_date=last_clear_date,
+                    title="Partly settled",
+                    subtitle="Confirmed payment / redirect already applied",
+                    signed_cents=clear_net,
+                ),
+                last_clear_sort_id,
             )
         )
 
     # Safety check: items shown MUST equal the exact net amount on the card
-    if sum(x.signed_cents for x in result) != target_net:
+    if sum(x.signed_cents for x, _ in result_with_order) != target_net:
         return [item for item, _, _ in reversed(ordered)]
 
-    return sorted(result, key=lambda x: x.item_date, reverse=True)
+    # Always newest at the top, oldest at the bottom (date desc, then id desc)
+    result_with_order.sort(key=lambda pair: (pair[0].item_date, pair[1]), reverse=True)
+    return [item for item, _ in result_with_order]
 
 
 def get_bill_breakdown(db: Session, current_user: User) -> BillBreakdownResponse:
@@ -313,11 +324,11 @@ def get_bill_breakdown(db: Session, current_user: User) -> BillBreakdownResponse
                     exp_id,
                 ))
 
-    # 3. Settlements involving me (for both FIFO cancellation & History tab)
+    # 3. Settlements involving me (for both FIFO cancellation & History tab, newest first)
     my_settlements = (
         db.query(Settlement)
         .filter((Settlement.from_user == me) | (Settlement.to_user == me))
-        .order_by(Settlement.created_at.desc())
+        .order_by(Settlement.created_at.desc(), Settlement.id.desc())
         .all()
     )
 
@@ -355,7 +366,7 @@ def get_bill_breakdown(db: Session, current_user: User) -> BillBreakdownResponse
                 ))
 
     # 4. Debt redirects involving me (outgoing redirects clear debt; incoming redirects create debt)
-    all_transfers = db.query(DebtTransfer).order_by(DebtTransfer.created_at.desc()).all()
+    all_transfers = db.query(DebtTransfer).order_by(DebtTransfer.created_at.desc(), DebtTransfer.id.desc()).all()
     notices = []
     for t in all_transfers:
         a_name = user_map.get(t.from_debtor, "Unknown")
@@ -455,19 +466,33 @@ def get_bill_breakdown(db: Session, current_user: User) -> BillBreakdownResponse
                 t.id,
             ))
 
-    person_cards = []
-    for other_id, net in sorted(my_pair_net.items(), key=lambda pair: (pair[1] > 0, -abs(pair[1]))):
+    person_cards_with_recency = []
+    for other_id, net in my_pair_net.items():
         card_items = _filter_open_items(items_by_other[other_id], target_net=net)
-        person_cards.append(
-            PersonBillCardResponse(
-                other_user_id=other_id,
-                other_user_name=user_map.get(other_id, "Unknown"),
-                direction="you_owe" if net < 0 else "owes_you",
-                net_cents=abs(net),
-                pending_sent_cents=pending_sent_by_other.get(other_id, 0),
-                items=card_items,
+        latest_key = max(
+            ((item.item_date, sort_id) for item, _, sort_id in items_by_other[other_id]),
+            default=("", 0),
+        )
+        person_cards_with_recency.append(
+            (
+                latest_key,
+                PersonBillCardResponse(
+                    other_user_id=other_id,
+                    other_user_name=user_map.get(other_id, "Unknown"),
+                    direction="you_owe" if net < 0 else "owes_you",
+                    net_cents=abs(net),
+                    pending_sent_cents=pending_sent_by_other.get(other_id, 0),
+                    items=card_items,
+                ),
             )
         )
+
+    # Newest bill/payment activity at the top, older people below
+    person_cards_with_recency.sort(
+        key=lambda entry: (entry[0][0], entry[0][1], entry[1].net_cents),
+        reverse=True,
+    )
+    person_cards = [card for _, card in person_cards_with_recency]
 
     total_you_owe = sum(-net for net in my_pair_net.values() if net < 0)
     total_owed_to_you = sum(net for net in my_pair_net.values() if net > 0)

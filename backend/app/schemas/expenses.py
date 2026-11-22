@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -51,6 +51,7 @@ class ExpenseResponse(BaseModel):
 class MyBillRow(BaseModel):
     expense_id: int
     expense_date: date
+    created_at: datetime | None = None
     section: str
     item_name: str
     paid_by_name: str

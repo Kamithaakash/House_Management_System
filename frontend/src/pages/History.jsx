@@ -37,8 +37,14 @@ export default function History() {
   const redirects = breakdown.data?.redirect_notices ?? EMPTY
   const otherDebts = breakdown.data?.other_debts ?? EMPTY
 
-  // Memoized combined timeline sorted newest first
+  // Memoized combined timeline sorted newest first (date desc, then exact timestamp desc, then id desc)
   const timeline = useMemo(() => {
+    const toMs = (iso, fallbackDate) => {
+      const parsed = iso ? Date.parse(iso) : NaN
+      if (!Number.isNaN(parsed)) return parsed
+      return fallbackDate ? Date.parse(`${fallbackDate}T00:00:00Z`) || 0 : 0
+    }
+
     const list = []
     if (filter === 'all' || filter === 'expenses') {
       for (const row of expenses) {
@@ -46,31 +52,41 @@ export default function History() {
           key: `exp-${row.expense_id}`,
           kind: 'expense',
           sortDate: row.expense_date,
+          sortTs: toMs(row.created_at, row.expense_date),
+          sortId: row.expense_id,
           data: row,
         })
       }
     }
     if (filter === 'all' || filter === 'payments') {
       for (const s of settlements) {
+        const day = s.created_at.slice(0, 10)
         list.push({
           key: `set-${s.id}`,
           kind: 'settlement',
-          sortDate: s.created_at.slice(0, 10),
+          sortDate: day,
+          sortTs: toMs(s.created_at, day),
+          sortId: s.id,
           data: s,
         })
       }
     }
     if (filter === 'all' || filter === 'redirects') {
       for (const n of redirects) {
+        const day = n.created_at.slice(0, 10)
         list.push({
           key: `red-${n.id}`,
           kind: 'redirect',
-          sortDate: n.created_at.slice(0, 10),
+          sortDate: day,
+          sortTs: toMs(n.created_at, day),
+          sortId: n.id,
           data: n,
         })
       }
     }
-    return list.sort((a, b) => b.sortDate.localeCompare(a.sortDate))
+    return list.sort(
+      (a, b) => b.sortDate.localeCompare(a.sortDate) || b.sortTs - a.sortTs || b.sortId - a.sortId,
+    )
   }, [filter, expenses, settlements, redirects])
 
   async function removeExpense(id) {

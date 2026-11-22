@@ -177,18 +177,17 @@ def test_breakdown_hides_settled_transactions_and_shows_only_open_mutual_offset(
         "expense_date": "2026-11-20", "split_mode": "per_person", "per_person_cents": {"2": 2000},
     })
 
-    # Alice's dropdown for Bob must show ONLY the 2 unsettled items (NOT Old Lunch, NOT Cash payment)
+    # Alice's dropdown for Bob must show ONLY the 2 unsettled items, newest first (NOT Old Lunch, NOT Cash payment)
     alice_card = client.get("/api/bill/breakdown").json()["person_cards"][0]
     assert alice_card["net_cents"] == 3000
     assert alice_card["direction"] == "you_owe"
-    titles = {item["title"] for item in alice_card["items"]}
-    assert titles == {"New Rice & Curry", "Dish Soap"}
+    assert [item["title"] for item in alice_card["items"]] == ["Dish Soap", "New Rice & Curry"]
     assert sum(item["signed_cents"] for item in alice_card["items"]) == -3000
 
-    # Bob's dropdown for Alice also shows ONLY those same 2 unsettled items (sum = +3000)
+    # Bob's dropdown for Alice also shows ONLY those same 2 unsettled items, newest first (sum = +3000)
     login("bob@test.com")
     bob_card = client.get("/api/bill/breakdown").json()["person_cards"][0]
     assert bob_card["net_cents"] == 3000
     assert bob_card["direction"] == "owes_you"
-    assert {item["title"] for item in bob_card["items"]} == {"New Rice & Curry", "Dish Soap"}
+    assert [item["title"] for item in bob_card["items"]] == ["Dish Soap", "New Rice & Curry"]
     assert sum(item["signed_cents"] for item in bob_card["items"]) == 3000
