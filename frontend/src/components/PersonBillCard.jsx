@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { memo, useState } from 'react'
 import useAction from '../hooks/useAction'
 import useOnlineStatus from '../hooks/useOnlineStatus'
 import { centsToText, formatCents, rupeesToCents } from '../utils/money'
@@ -242,7 +242,7 @@ function PayInline({ otherName, owedCents, pendingCents, onPay }) {
 }
 
 // Expandable person-to-person bill box (Progressive Disclosure + Itemized Receipt design).
-export default function PersonBillCard({ card, incomingClaimCents = 0, onPay }) {
+const PersonBillCard = memo(function PersonBillCard({ card, incomingClaimCents = 0, onPay }) {
   const [open, setOpen] = useState(false)
   const isOwe = card.direction === 'you_owe'
   const firstName = (card.other_user_name || '?').split(' ')[0]
@@ -250,12 +250,12 @@ export default function PersonBillCard({ card, incomingClaimCents = 0, onPay }) 
   const openItemsCount = card.items.length
 
   return (
-    <article className="overflow-hidden rounded-2xl border border-white/90 bg-white/75 shadow-sm ring-1 ring-slate-200/70 backdrop-blur-lg">
+    <article className="overflow-hidden rounded-2xl border border-slate-900/12 bg-white/15 backdrop-blur-sm">
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
         aria-expanded={open}
-        className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors duration-150 hover:bg-white/50"
+        className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors duration-150 hover:bg-white/25"
       >
         <span
           className={`grid size-11 shrink-0 place-items-center rounded-full text-sm font-semibold ${
@@ -308,9 +308,9 @@ export default function PersonBillCard({ card, incomingClaimCents = 0, onPay }) 
       )}
 
       {open && (
-        <div className="border-t border-slate-200/60 pt-3">
+        <div className="border-t border-slate-900/10 pt-3">
           {/* Itemized digital receipt */}
-          <div className="mx-3 mb-3 rounded-xl border border-slate-200/60 bg-slate-50/75 backdrop-blur-sm">
+          <div className="mx-3 mb-3 rounded-xl border border-slate-900/10 bg-transparent">
             <div className="flex items-center justify-between gap-2 border-b border-dashed border-slate-200 px-3 py-2.5">
               <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700">
                 <ReceiptIcon className="size-3.5" />
@@ -387,4 +387,6 @@ export default function PersonBillCard({ card, incomingClaimCents = 0, onPay }) 
       )}
     </article>
   )
-}
+})
+
+export default PersonBillCard
