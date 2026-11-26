@@ -23,33 +23,36 @@ function HeroSummaryCard({ youOweCents, owedToYouCents, online }) {
   const owePct = total > 0 ? Math.round((youOweCents / total) * 100) : 50
 
   return (
-    <section aria-label="Your financial position" className="rounded-2xl bg-slate-900 p-5 text-white shadow-sm">
-      <div className="flex items-center justify-between gap-3 text-xs text-slate-400">
+    <section
+      aria-label="Your financial position"
+      className="rounded-2xl border border-white/80 bg-white/75 p-5 text-slate-900 shadow-sm ring-1 ring-slate-200/70 backdrop-blur-md"
+    >
+      <div className="flex items-center justify-between gap-3 text-xs text-slate-500">
         <span>Net balance</span>
-        <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
-          <span className={`size-1.5 rounded-full ${online ? 'bg-emerald-400' : 'bg-amber-400'}`} />
+        <span className="inline-flex items-center gap-1.5 whitespace-nowrap font-medium text-slate-600">
+          <span className={`size-1.5 rounded-full ${online ? 'bg-emerald-500' : 'bg-amber-500'}`} />
           {online ? 'Up to date' : 'Offline'}
         </span>
       </div>
 
       {settled ? (
         <div className="mt-3 flex items-center gap-2.5">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="size-7 text-emerald-400" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="size-7 text-emerald-600" aria-hidden="true">
             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" strokeLinecap="round" strokeLinejoin="round" />
             <path d="m9 11 3 3L22 4" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          <p className="text-[26px] font-semibold leading-tight tracking-tight">All settled up</p>
+          <p className="text-[26px] font-semibold leading-tight tracking-tight text-slate-900">All settled up</p>
         </div>
       ) : (
         <div className="mt-2">
           <p
             className={`font-mono text-[30px] font-semibold leading-tight tracking-tight tabular-nums ${
-              netCents >= 0 ? 'text-emerald-400' : 'text-red-400'
+              netCents >= 0 ? 'text-emerald-700' : 'text-red-600'
             }`}
           >
             {netCents >= 0 ? '+' : '−'} {formatCents(Math.abs(netCents))}
           </p>
-          <p className="mt-0.5 text-sm text-slate-400">
+          <p className="mt-0.5 text-sm text-slate-500">
             {netCents > 0
               ? 'Net to receive after everyone settles'
               : netCents < 0
@@ -60,22 +63,22 @@ function HeroSummaryCard({ youOweCents, owedToYouCents, online }) {
       )}
 
       <div className="mt-5 grid grid-cols-2 gap-2">
-        <div className="rounded-xl bg-white/[0.06] px-3 py-2.5">
-          <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-red-500/20 px-2 py-0.5 text-[11px] font-semibold text-red-300">
-            <span className="size-1.5 rounded-full bg-red-400" />
+        <div className="rounded-xl border border-slate-200/70 bg-white/60 px-3 py-2.5 backdrop-blur-sm">
+          <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-red-50 px-2 py-0.5 text-[11px] font-semibold text-red-700">
+            <span className="size-1.5 rounded-full bg-red-500" />
             You Owe
           </span>
-          <p className="mt-1.5 whitespace-nowrap font-mono text-[15px] font-semibold tabular-nums text-white">
+          <p className="mt-1.5 whitespace-nowrap font-mono text-[15px] font-semibold tabular-nums text-slate-900">
             {formatCents(youOweCents)}
           </p>
         </div>
 
-        <div className="rounded-xl bg-white/[0.06] px-3 py-2.5">
-          <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-emerald-500/20 px-2 py-0.5 text-[11px] font-semibold text-emerald-300">
-            <span className="size-1.5 rounded-full bg-emerald-400" />
+        <div className="rounded-xl border border-slate-200/70 bg-white/60 px-3 py-2.5 backdrop-blur-sm">
+          <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">
+            <span className="size-1.5 rounded-full bg-emerald-500" />
             Owed to You
           </span>
-          <p className="mt-1.5 whitespace-nowrap font-mono text-[15px] font-semibold tabular-nums text-white">
+          <p className="mt-1.5 whitespace-nowrap font-mono text-[15px] font-semibold tabular-nums text-slate-900">
             {formatCents(owedToYouCents)}
           </p>
         </div>
@@ -83,14 +86,14 @@ function HeroSummaryCard({ youOweCents, owedToYouCents, online }) {
 
       <div className="mt-4" aria-hidden="true">
         {settled ? (
-          <div className="h-1.5 rounded-full bg-slate-700" />
+          <div className="h-1.5 rounded-full bg-slate-200" />
         ) : (
           <div className="flex h-1.5 gap-1">
             {youOweCents > 0 && (
-              <div className="rounded-full bg-red-400" style={{ width: `${owePct}%` }} />
+              <div className="rounded-full bg-red-500" style={{ width: `${owePct}%` }} />
             )}
             {owedToYouCents > 0 && (
-              <div className="flex-1 rounded-full bg-emerald-400" />
+              <div className="flex-1 rounded-full bg-emerald-500" />
             )}
           </div>
         )}
