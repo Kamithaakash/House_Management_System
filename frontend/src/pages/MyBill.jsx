@@ -117,7 +117,7 @@ const ConfirmSettlementAlert = memo(function ConfirmSettlementAlert({
     >
       <div className="flex items-start gap-3">
         <div className="relative shrink-0">
-          <span className="grid size-10 place-items-center rounded-full bg-slate-900 text-[13px] font-semibold text-white">
+          <span className="grid size-10 place-items-center rounded-full bg-indigo-700 text-[13px] font-semibold text-white">
             {getInitials(settlement.from_name)}
           </span>
           <span className="absolute -bottom-0.5 -right-0.5 grid size-4 place-items-center rounded-full bg-amber-600 ring-2 ring-amber-50">
@@ -210,7 +210,7 @@ function SmartRedirectCard({ fromCard, toCard, online, onRedirect }) {
         <span className="text-slate-400" aria-hidden="true">→</span>
 
         <div className="flex flex-col items-center gap-1 px-1">
-          <span className="grid size-10 place-items-center rounded-full bg-slate-900 text-[13px] font-semibold text-white">
+          <span className="grid size-10 place-items-center rounded-full bg-indigo-700 text-[13px] font-semibold text-white">
             You
           </span>
           <span className="text-[11px] text-slate-500">Skipped</span>
@@ -447,7 +447,6 @@ export default function MyBill() {
           <h2 id="people-heading" className="text-[15px] font-semibold tracking-tight text-slate-900">
             Balances by housemate
           </h2>
-          {!isFullySettled && <span className="text-xs text-slate-500">Open items only</span>}
         </div>
 
         {isFullySettled ? (

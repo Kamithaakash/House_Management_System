@@ -35,14 +35,6 @@ const ClockIcon = ({ className }) => (
   </Icon>
 )
 
-const ReceiptIcon = ({ className }) => (
-  <Icon className={className}>
-    <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z" />
-    <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" />
-    <path d="M12 17.5v-11" />
-  </Icon>
-)
-
 const BanknoteIcon = ({ className }) => (
   <Icon className={className}>
     <rect width="20" height="12" x="2" y="6" rx="2" />
@@ -123,7 +115,9 @@ function Chip({ active, onClick, children }) {
       onClick={onClick}
       aria-pressed={active}
       className={`inline-flex h-10 items-center whitespace-nowrap rounded-full px-3.5 text-[13px] font-semibold transition-colors duration-150 ${
-        active ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+        active
+          ? 'border border-indigo-600/40 bg-indigo-50/75 text-indigo-700'
+          : 'border border-white/60 bg-white/30 text-slate-700 hover:bg-white/50'
       }`}
     >
       {children}
@@ -199,10 +193,10 @@ function PayInline({ otherName, owedCents, pendingCents, onPay }) {
         Amount paid in cash to {otherName}
       </label>
       <div
-        className={`mt-3 flex h-12 items-center rounded-xl border bg-white px-3 focus-within:ring-2 ${
+        className={`mt-3 flex h-12 items-center rounded-xl border bg-white/45 px-3 focus-within:ring-2 ${
           tooMuch
             ? 'border-red-500 focus-within:ring-red-100'
-            : 'border-slate-300 focus-within:border-indigo-600 focus-within:ring-indigo-100'
+            : 'border-white/65 focus-within:border-indigo-600 focus-within:ring-indigo-100'
         }`}
       >
         <span className="font-mono text-sm text-slate-500">Rs.</span>
@@ -229,14 +223,16 @@ function PayInline({ otherName, owedCents, pendingCents, onPay }) {
       <button
         type="submit"
         disabled={busy || !online || !typedCents || typedCents <= 0 || tooMuch}
-        className="mt-3 inline-flex h-12 w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-slate-900 text-[15px] font-semibold text-white transition hover:bg-slate-800 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
+        className="mt-3 inline-flex h-12 w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-indigo-700 text-[15px] font-semibold text-white shadow-sm transition hover:bg-indigo-800 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
       >
         <BanknoteIcon className="size-4" />
         {busy ? 'Recording payment…' : 'I Paid Cash'}
       </button>
-      <p className="mt-2 text-center text-xs text-slate-500">
-        {!online ? 'Reconnect to internet to submit payment.' : `${firstName} gets a request to confirm it.`}
-      </p>
+      {!online && (
+        <p className="mt-2 text-center text-xs text-slate-500">
+          Reconnect to internet to submit payment.
+        </p>
+      )}
     </form>
   )
 }
@@ -247,7 +243,6 @@ const PersonBillCard = memo(function PersonBillCard({ card, incomingClaimCents =
   const isOwe = card.direction === 'you_owe'
   const firstName = (card.other_user_name || '?').split(' ')[0]
   const initials = getInitials(card.other_user_name)
-  const openItemsCount = card.items.length
 
   return (
     <article className="overflow-hidden rounded-3xl border border-white/55 bg-white/25 shadow-lg shadow-slate-900/5 backdrop-blur-md">
@@ -267,9 +262,6 @@ const PersonBillCard = memo(function PersonBillCard({ card, incomingClaimCents =
 
         <div className="min-w-0 flex-1">
           <p className="truncate text-[15px] font-semibold text-slate-900">{card.other_user_name}</p>
-          <p className="mt-0.5 truncate text-xs text-slate-500">
-            {openItemsCount} unsettled {openItemsCount === 1 ? 'item' : 'items'} · {open ? 'Tap to close' : 'Tap to inspect'}
-          </p>
         </div>
 
         <div className="flex shrink-0 flex-col items-end gap-1">
@@ -311,14 +303,6 @@ const PersonBillCard = memo(function PersonBillCard({ card, incomingClaimCents =
         <div className="border-t border-white/40 pt-3">
           {/* Itemized digital receipt */}
           <div className="mx-3 mb-3 rounded-2xl border border-white/50 bg-white/25">
-            <div className="flex items-center justify-between gap-2 border-b border-dashed border-slate-200 px-3 py-2.5">
-              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700">
-                <ReceiptIcon className="size-3.5" />
-                Open items with {firstName}
-              </span>
-              <span className="text-[11px] text-slate-500">+ owes you · − you owe</span>
-            </div>
-
             <ul className="divide-y divide-slate-200/70 px-3">
               {card.items.map((item, idx) => {
                 const positive = item.signed_cents > 0
@@ -360,9 +344,6 @@ const PersonBillCard = memo(function PersonBillCard({ card, incomingClaimCents =
                   {isOwe ? '−' : '+'} {formatCents(card.net_cents)}
                 </span>
               </div>
-              <p className="mt-0.5 text-right text-xs text-slate-500">
-                {isOwe ? `You owe ${firstName}` : `${firstName} owes you`} · {card.items.length} item(s) add up exactly
-              </p>
             </div>
           </div>
 
