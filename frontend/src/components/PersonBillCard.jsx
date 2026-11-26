@@ -250,12 +250,12 @@ export default function PersonBillCard({ card, incomingClaimCents = 0, onPay }) 
   const openItemsCount = card.items.length
 
   return (
-    <article className="overflow-hidden rounded-2xl border border-white/75 bg-white/50 shadow-sm ring-1 ring-indigo-950/5 backdrop-blur-xl">
+    <article className="overflow-hidden rounded-2xl border border-white/90 bg-white/75 shadow-sm ring-1 ring-slate-200/70 backdrop-blur-lg">
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
         aria-expanded={open}
-        className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors duration-150 hover:bg-white/35"
+        className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors duration-150 hover:bg-white/50"
       >
         <span
           className={`grid size-11 shrink-0 place-items-center rounded-full text-sm font-semibold ${
@@ -308,9 +308,9 @@ export default function PersonBillCard({ card, incomingClaimCents = 0, onPay }) 
       )}
 
       {open && (
-        <div className="border-t border-white/60 pt-3">
+        <div className="border-t border-slate-200/60 pt-3">
           {/* Itemized digital receipt */}
-          <div className="mx-3 mb-3 rounded-xl border border-white/70 bg-white/55 backdrop-blur-md">
+          <div className="mx-3 mb-3 rounded-xl border border-slate-200/60 bg-slate-50/75 backdrop-blur-sm">
             <div className="flex items-center justify-between gap-2 border-b border-dashed border-slate-200 px-3 py-2.5">
               <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700">
                 <ReceiptIcon className="size-3.5" />
