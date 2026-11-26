@@ -223,7 +223,7 @@ function PayInline({ otherName, owedCents, pendingCents, onPay }) {
       <button
         type="submit"
         disabled={busy || !online || !typedCents || typedCents <= 0 || tooMuch}
-        className="mt-3 inline-flex h-12 w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-indigo-700 text-[15px] font-semibold text-white shadow-sm transition hover:bg-indigo-800 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
+        className="mt-3 inline-flex h-12 w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-indigo-400/50 bg-indigo-600/75 text-[15px] font-semibold text-white shadow-sm backdrop-blur-sm transition hover:bg-indigo-700/85 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
       >
         <BanknoteIcon className="size-4" />
         {busy ? 'Recording payment…' : 'I Paid Cash'}
@@ -324,7 +324,7 @@ const PersonBillCard = memo(function PersonBillCard({ card, incomingClaimCents =
                         </span>
                       </div>
                       <p className="mt-0.5 text-xs leading-relaxed text-slate-500">{item.subtitle}</p>
-                      <span className="mt-1.5 inline-block rounded-md bg-white px-1.5 py-0.5 font-mono text-[10px] font-medium text-slate-500 ring-1 ring-inset ring-slate-200">
+                      <span className="mt-1 block font-mono text-[11px] text-slate-400">
                         {item.item_date}
                       </span>
                     </div>

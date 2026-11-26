@@ -52,13 +52,6 @@ const HeroSummaryCard = memo(function HeroSummaryCard({ youOweCents, owedToYouCe
           >
             {netCents >= 0 ? '+' : '−'} {formatCents(Math.abs(netCents))}
           </p>
-          <p className="mt-0.5 text-sm text-slate-500">
-            {netCents > 0
-              ? 'Net to receive after everyone settles'
-              : netCents < 0
-                ? 'Net to pay after everyone settles'
-                : 'You break even'}
-          </p>
         </div>
       )}
 
