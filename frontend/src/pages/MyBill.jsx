@@ -25,7 +25,7 @@ function HeroSummaryCard({ youOweCents, owedToYouCents, online }) {
   return (
     <section
       aria-label="Your financial position"
-      className="rounded-2xl border border-white/80 bg-white/75 p-5 text-slate-900 shadow-sm ring-1 ring-slate-200/70 backdrop-blur-md"
+      className="rounded-2xl border border-white/80 bg-white/60 p-5 text-slate-900 shadow-sm ring-1 ring-slate-200/60 backdrop-blur-xl"
     >
       <div className="flex items-center justify-between gap-3 text-xs text-slate-500">
         <span>Net balance</span>
@@ -370,7 +370,17 @@ export default function MyBill() {
   ]
 
   return (
-    <Page title="My Bill & Payments">
+    <>
+      <div className="pointer-events-none fixed inset-0 z-0 mx-auto max-w-md overflow-hidden" aria-hidden="true">
+        <img
+          src="/bill-bg.jpg"
+          alt=""
+          className="h-full w-full object-cover object-center"
+        />
+      </div>
+
+      <div className="relative z-[1]">
+        <Page title="My Bill & Payments">
       <ErrorText text={actionError} />
 
       <HeroSummaryCard
@@ -478,6 +488,8 @@ export default function MyBill() {
           </>
         )}
       </section>
-    </Page>
+        </Page>
+      </div>
+    </>
   )
 }
