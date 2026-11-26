@@ -377,12 +377,12 @@ export default function MyBill() {
 
   return (
     <>
-      {/* Zero-blur-cost soft blue/slate backdrop so backdrop-blur-md cards frost like the Login UI */}
+      {/* Very soft, low-intensity blue/slate backdrop that fades cleanly into top header & bottom nav */}
       <div
-        className="pointer-events-none fixed inset-0 z-0 mx-auto max-w-md transform-gpu bg-slate-100"
+        className="pointer-events-none fixed inset-0 z-0 mx-auto max-w-md transform-gpu bg-slate-50"
         style={{
           backgroundImage:
-            'radial-gradient(circle at 18% 14%, rgba(99, 102, 241, 0.24) 0%, rgba(99, 102, 241, 0.08) 32%, transparent 56%), radial-gradient(circle at 86% 38%, rgba(56, 189, 248, 0.22) 0%, rgba(56, 189, 248, 0.06) 30%, transparent 54%), radial-gradient(circle at 25% 80%, rgba(129, 140, 248, 0.20) 0%, transparent 52%)',
+            'linear-gradient(to bottom, rgba(248, 250, 252, 0.92) 0%, transparent 16%, transparent 82%, rgba(248, 250, 252, 0.95) 100%), radial-gradient(circle at 20% 28%, rgba(99, 102, 241, 0.11) 0%, transparent 48%), radial-gradient(circle at 82% 55%, rgba(56, 189, 248, 0.10) 0%, transparent 48%), radial-gradient(circle at 30% 72%, rgba(129, 140, 248, 0.08) 0%, transparent 45%)',
         }}
         aria-hidden="true"
       />
