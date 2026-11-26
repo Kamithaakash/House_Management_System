@@ -25,7 +25,7 @@ const HeroSummaryCard = memo(function HeroSummaryCard({ youOweCents, owedToYouCe
   return (
     <section
       aria-label="Your financial position"
-      className="rounded-2xl border border-slate-900/12 bg-white/15 p-5 text-slate-900 backdrop-blur-sm"
+      className="rounded-3xl border border-white/55 bg-white/25 p-5 text-slate-900 shadow-lg shadow-slate-900/5 backdrop-blur-md"
     >
       <div className="flex items-center justify-between gap-3 text-xs text-slate-500">
         <span>Net balance</span>
@@ -63,7 +63,7 @@ const HeroSummaryCard = memo(function HeroSummaryCard({ youOweCents, owedToYouCe
       )}
 
       <div className="mt-5 grid grid-cols-2 gap-2">
-        <div className="rounded-xl border border-slate-900/10 bg-transparent px-3 py-2.5">
+        <div className="rounded-2xl border border-white/50 bg-white/20 px-3 py-2.5">
           <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-red-500/10 px-2 py-0.5 text-[11px] font-semibold text-red-700">
             <span className="size-1.5 rounded-full bg-red-500" />
             You Owe
@@ -73,7 +73,7 @@ const HeroSummaryCard = memo(function HeroSummaryCard({ youOweCents, owedToYouCe
           </p>
         </div>
 
-        <div className="rounded-xl border border-slate-900/10 bg-transparent px-3 py-2.5">
+        <div className="rounded-2xl border border-white/50 bg-white/20 px-3 py-2.5">
           <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">
             <span className="size-1.5 rounded-full bg-emerald-500" />
             Owed to You
@@ -113,7 +113,7 @@ const ConfirmSettlementAlert = memo(function ConfirmSettlementAlert({
     <article
       role="alert"
       aria-label="Payment waiting for your confirmation"
-      className="rounded-2xl border border-amber-600/30 bg-white/15 p-4 backdrop-blur-sm"
+      className="rounded-3xl border border-amber-300/60 bg-white/25 p-4 shadow-lg shadow-slate-900/5 backdrop-blur-md"
     >
       <div className="flex items-start gap-3">
         <div className="relative shrink-0">
@@ -186,7 +186,7 @@ function SmartRedirectCard({ fromCard, toCard, online, onRedirect }) {
   }
 
   return (
-    <article className="rounded-2xl border border-slate-900/12 bg-white/15 p-4 backdrop-blur-sm">
+    <article className="rounded-3xl border border-white/55 bg-white/25 p-4 shadow-lg shadow-slate-900/5 backdrop-blur-md">
       <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-700">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="size-3.5" aria-hidden="true">
           <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
@@ -308,7 +308,7 @@ function SmartRedirectCard({ fromCard, toCard, online, onRedirect }) {
 
 function SettledEmptyState() {
   return (
-    <div className="rounded-2xl border border-slate-900/12 bg-white/15 px-6 py-10 text-center backdrop-blur-sm">
+    <div className="rounded-3xl border border-white/55 bg-white/25 px-6 py-10 text-center shadow-lg shadow-slate-900/5 backdrop-blur-md">
       <div className="mx-auto grid size-16 place-items-center rounded-2xl bg-emerald-50 ring-1 ring-inset ring-emerald-200">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className="size-8 text-emerald-600" aria-hidden="true">
           <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
@@ -377,12 +377,12 @@ export default function MyBill() {
 
   return (
     <>
-      {/* Zero-cost CSS radial gradient background (no live blur-3xl filter -> smooth 60fps on mobile) */}
+      {/* Zero-blur-cost soft blue/slate backdrop so backdrop-blur-md cards frost like the Login UI */}
       <div
-        className="pointer-events-none fixed inset-0 z-0 mx-auto max-w-md transform-gpu bg-slate-50"
+        className="pointer-events-none fixed inset-0 z-0 mx-auto max-w-md transform-gpu bg-slate-100"
         style={{
           backgroundImage:
-            'radial-gradient(circle at 12% 10%, rgba(165, 180, 252, 0.32) 0%, transparent 48%), radial-gradient(circle at 88% 36%, rgba(148, 163, 184, 0.28) 0%, transparent 52%), radial-gradient(circle at 22% 82%, rgba(199, 210, 254, 0.30) 0%, transparent 50%)',
+            'radial-gradient(circle at 18% 14%, rgba(99, 102, 241, 0.24) 0%, rgba(99, 102, 241, 0.08) 32%, transparent 56%), radial-gradient(circle at 86% 38%, rgba(56, 189, 248, 0.22) 0%, rgba(56, 189, 248, 0.06) 30%, transparent 54%), radial-gradient(circle at 25% 80%, rgba(129, 140, 248, 0.20) 0%, transparent 52%)',
         }}
         aria-hidden="true"
       />
@@ -415,7 +415,7 @@ export default function MyBill() {
 
       {/* Outgoing pending confirmation banner */}
       {sentByMe.map((s) => (
-        <p key={s.id} className="rounded-xl border border-amber-600/30 bg-white/15 p-3 text-xs font-medium text-amber-900 backdrop-blur-sm">
+        <p key={s.id} className="rounded-2xl border border-amber-300/60 bg-white/25 p-3 text-xs font-medium text-amber-900 shadow-sm backdrop-blur-md">
           Pending confirmation: your {formatCents(s.amount_cents)} payment to {s.to_name}
         </p>
       ))}
@@ -454,7 +454,7 @@ export default function MyBill() {
           <SettledEmptyState />
         ) : (
           <>
-            <div role="tablist" aria-label="Filter balances" className="grid grid-cols-2 gap-1 rounded-xl border border-slate-900/12 bg-white/15 p-1 backdrop-blur-sm">
+            <div role="tablist" aria-label="Filter balances" className="grid grid-cols-2 gap-1 rounded-2xl border border-white/55 bg-white/25 p-1 shadow-sm backdrop-blur-md">
               {tabs.map(([key, label, count]) => {
                 const active = activeTab === key
                 return (
@@ -464,8 +464,8 @@ export default function MyBill() {
                     role="tab"
                     aria-selected={active}
                     onClick={() => setActiveTab(key)}
-                    className={`flex h-10 items-center justify-center whitespace-nowrap rounded-[10px] px-1.5 text-[12px] font-semibold transition ${
-                      active ? 'border border-slate-900/10 bg-white/55 text-slate-900' : 'text-slate-600 hover:text-slate-900'
+                    className={`flex h-10 items-center justify-center whitespace-nowrap rounded-xl px-1.5 text-[12px] font-semibold transition ${
+                      active ? 'bg-white/75 text-slate-900 shadow-xs' : 'text-slate-700 hover:text-slate-900'
                     }`}
                   >
                     {label}{' '}
@@ -478,7 +478,7 @@ export default function MyBill() {
             </div>
 
             {visibleCards.length === 0 ? (
-              <p className="rounded-2xl border border-slate-900/12 bg-white/15 py-8 text-center text-sm text-slate-600 backdrop-blur-sm">
+              <p className="rounded-3xl border border-white/55 bg-white/25 py-8 text-center text-sm text-slate-600 shadow-lg shadow-slate-900/5 backdrop-blur-md">
                 No housemates in this filter.
               </p>
             ) : (

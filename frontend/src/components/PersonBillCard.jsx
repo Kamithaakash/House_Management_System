@@ -250,12 +250,12 @@ const PersonBillCard = memo(function PersonBillCard({ card, incomingClaimCents =
   const openItemsCount = card.items.length
 
   return (
-    <article className="overflow-hidden rounded-2xl border border-slate-900/12 bg-white/15 backdrop-blur-sm">
+    <article className="overflow-hidden rounded-3xl border border-white/55 bg-white/25 shadow-lg shadow-slate-900/5 backdrop-blur-md">
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
         aria-expanded={open}
-        className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors duration-150 hover:bg-white/25"
+        className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors duration-150 hover:bg-white/20"
       >
         <span
           className={`grid size-11 shrink-0 place-items-center rounded-full text-sm font-semibold ${
@@ -308,9 +308,9 @@ const PersonBillCard = memo(function PersonBillCard({ card, incomingClaimCents =
       )}
 
       {open && (
-        <div className="border-t border-slate-900/10 pt-3">
+        <div className="border-t border-white/40 pt-3">
           {/* Itemized digital receipt */}
-          <div className="mx-3 mb-3 rounded-xl border border-slate-900/10 bg-transparent">
+          <div className="mx-3 mb-3 rounded-2xl border border-white/50 bg-white/25">
             <div className="flex items-center justify-between gap-2 border-b border-dashed border-slate-200 px-3 py-2.5">
               <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700">
                 <ReceiptIcon className="size-3.5" />
