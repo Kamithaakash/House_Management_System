@@ -25,7 +25,7 @@ function HeroSummaryCard({ youOweCents, owedToYouCents, online }) {
   return (
     <section
       aria-label="Your financial position"
-      className="rounded-2xl border border-white/80 bg-white/60 p-5 text-slate-900 shadow-sm ring-1 ring-slate-200/60 backdrop-blur-xl"
+      className="rounded-2xl border border-white/75 bg-white/45 p-5 text-slate-900 shadow-sm ring-1 ring-indigo-950/5 backdrop-blur-xl"
     >
       <div className="flex items-center justify-between gap-3 text-xs text-slate-500">
         <span>Net balance</span>
@@ -63,8 +63,8 @@ function HeroSummaryCard({ youOweCents, owedToYouCents, online }) {
       )}
 
       <div className="mt-5 grid grid-cols-2 gap-2">
-        <div className="rounded-xl border border-slate-200/70 bg-white/60 px-3 py-2.5 backdrop-blur-sm">
-          <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-red-50 px-2 py-0.5 text-[11px] font-semibold text-red-700">
+        <div className="rounded-xl border border-white/80 bg-white/45 px-3 py-2.5 backdrop-blur-md">
+          <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-red-50/90 px-2 py-0.5 text-[11px] font-semibold text-red-700">
             <span className="size-1.5 rounded-full bg-red-500" />
             You Owe
           </span>
@@ -73,8 +73,8 @@ function HeroSummaryCard({ youOweCents, owedToYouCents, online }) {
           </p>
         </div>
 
-        <div className="rounded-xl border border-slate-200/70 bg-white/60 px-3 py-2.5 backdrop-blur-sm">
-          <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">
+        <div className="rounded-xl border border-white/80 bg-white/45 px-3 py-2.5 backdrop-blur-md">
+          <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-emerald-50/90 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">
             <span className="size-1.5 rounded-full bg-emerald-500" />
             Owed to You
           </span>
@@ -107,7 +107,7 @@ function ConfirmSettlementAlert({ settlement, busy, online, onConfirm, onReject 
     <article
       role="alert"
       aria-label="Payment waiting for your confirmation"
-      className="rounded-2xl border border-amber-200 bg-amber-50 p-4 shadow-xs"
+      className="rounded-2xl border border-amber-200/80 bg-amber-50/75 p-4 shadow-sm backdrop-blur-xl"
     >
       <div className="flex items-start gap-3">
         <div className="relative shrink-0">
@@ -180,7 +180,7 @@ function SmartRedirectCard({ fromCard, toCard, online, onRedirect }) {
   }
 
   return (
-    <article className="rounded-2xl border border-indigo-200 bg-white p-4 shadow-xs">
+    <article className="rounded-2xl border border-white/75 bg-white/50 p-4 shadow-sm ring-1 ring-indigo-950/5 backdrop-blur-xl">
       <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-700">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="size-3.5" aria-hidden="true">
           <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
@@ -302,7 +302,7 @@ function SmartRedirectCard({ fromCard, toCard, online, onRedirect }) {
 
 function SettledEmptyState() {
   return (
-    <div className="rounded-2xl border border-slate-200/80 bg-white px-6 py-10 text-center shadow-xs">
+    <div className="rounded-2xl border border-white/75 bg-white/50 px-6 py-10 text-center shadow-sm ring-1 ring-indigo-950/5 backdrop-blur-xl">
       <div className="mx-auto grid size-16 place-items-center rounded-2xl bg-emerald-50 ring-1 ring-inset ring-emerald-200">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className="size-8 text-emerald-600" aria-hidden="true">
           <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
@@ -371,12 +371,15 @@ export default function MyBill() {
 
   return (
     <>
-      <div className="pointer-events-none fixed inset-0 z-0 mx-auto max-w-md overflow-hidden" aria-hidden="true">
-        <img
-          src="/bill-bg.jpg"
-          alt=""
-          className="h-full w-full object-cover object-center"
-        />
+      {/* Uneven blurred blue/indigo mesh background for full-page glassmorphism */}
+      <div
+        className="pointer-events-none fixed inset-0 z-0 mx-auto max-w-md overflow-hidden bg-gradient-to-br from-slate-50 via-indigo-50/90 to-sky-100/80"
+        aria-hidden="true"
+      >
+        <div className="absolute -left-16 -top-12 h-72 w-72 rounded-full bg-indigo-400/35 blur-3xl" />
+        <div className="absolute -right-20 top-24 h-80 w-64 rounded-full bg-sky-400/35 blur-3xl" />
+        <div className="absolute left-10 top-1/2 h-64 w-72 rounded-full bg-blue-500/25 blur-3xl" />
+        <div className="absolute -bottom-16 -right-10 h-72 w-72 rounded-full bg-indigo-500/30 blur-3xl" />
       </div>
 
       <div className="relative z-[1]">
@@ -407,7 +410,7 @@ export default function MyBill() {
 
       {/* Outgoing pending confirmation banner */}
       {sentByMe.map((s) => (
-        <p key={s.id} className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs font-medium text-amber-900">
+        <p key={s.id} className="rounded-xl border border-amber-200/80 bg-amber-50/75 p-3 text-xs font-medium text-amber-900 backdrop-blur-md">
           Pending confirmation: your {formatCents(s.amount_cents)} payment to {s.to_name}
         </p>
       ))}
@@ -446,7 +449,7 @@ export default function MyBill() {
           <SettledEmptyState />
         ) : (
           <>
-            <div role="tablist" aria-label="Filter balances" className="grid grid-cols-2 gap-1 rounded-xl bg-slate-200/70 p-1">
+            <div role="tablist" aria-label="Filter balances" className="grid grid-cols-2 gap-1 rounded-xl border border-white/60 bg-white/35 p-1 backdrop-blur-md">
               {tabs.map(([key, label, count]) => {
                 const active = activeTab === key
                 return (
@@ -457,11 +460,11 @@ export default function MyBill() {
                     aria-selected={active}
                     onClick={() => setActiveTab(key)}
                     className={`flex h-10 items-center justify-center whitespace-nowrap rounded-[10px] px-1.5 text-[12px] font-semibold transition ${
-                      active ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                      active ? 'bg-white/85 text-slate-900 shadow-xs' : 'text-slate-700 hover:text-slate-900'
                     }`}
                   >
                     {label}{' '}
-                    <span className={`ml-1 font-mono text-[11px] tabular-nums ${active ? 'text-slate-500' : 'text-slate-400'}`}>
+                    <span className={`ml-1 font-mono text-[11px] tabular-nums ${active ? 'text-slate-500' : 'text-slate-500'}`}>
                       ({count})
                     </span>
                   </button>
@@ -470,7 +473,7 @@ export default function MyBill() {
             </div>
 
             {visibleCards.length === 0 ? (
-              <p className="rounded-2xl border border-slate-200/80 bg-white py-8 text-center text-sm text-slate-500">
+              <p className="rounded-2xl border border-white/75 bg-white/50 py-8 text-center text-sm text-slate-600 shadow-sm backdrop-blur-xl">
                 No housemates in this filter.
               </p>
             ) : (
