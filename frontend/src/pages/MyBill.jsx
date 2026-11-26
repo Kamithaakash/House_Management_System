@@ -338,7 +338,7 @@ export default function MyBill() {
   const online = useOnlineStatus()
   const { data, error, reload } = useLoad('/bill/breakdown')
   const { busy, error: actionError, run } = useAction()
-  const [activeTab, setActiveTab] = useState('all')
+  const [activeTab, setActiveTab] = useState('owe')
 
   if (error) return <ErrorText text={error} />
   if (!data) return <p className="py-6 text-center text-sm text-slate-500">Loading...</p>
@@ -362,11 +362,9 @@ export default function MyBill() {
   const isFullySettled = data.person_cards.length === 0
   const post = (path, body) => api(path, { method: 'POST', body }).then(reload)
 
-  const visibleCards =
-    activeTab === 'owe' ? youOweCards : activeTab === 'owed' ? owesYouCards : data.person_cards
+  const visibleCards = activeTab === 'owe' ? youOweCards : owesYouCards
 
   const tabs = [
-    ['all', 'All People', data.person_cards.length],
     ['owe', 'You Owe', youOweCards.length],
     ['owed', 'Owed to You', owesYouCards.length],
   ]
@@ -438,7 +436,7 @@ export default function MyBill() {
           <SettledEmptyState />
         ) : (
           <>
-            <div role="tablist" aria-label="Filter balances" className="grid grid-cols-3 gap-1 rounded-xl bg-slate-200/70 p-1">
+            <div role="tablist" aria-label="Filter balances" className="grid grid-cols-2 gap-1 rounded-xl bg-slate-200/70 p-1">
               {tabs.map(([key, label, count]) => {
                 const active = activeTab === key
                 return (
